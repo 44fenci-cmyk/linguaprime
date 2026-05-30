@@ -691,17 +691,8 @@
 
         // REGISTER SERVICE WORKER FOR OFFLINE AND PWA INSTALLATION
         function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('sw.js')
-                        .then(reg => {
-                            console.log('Service Worker başarıyla kaydedildi:', reg.scope);
-                        })
-                        .catch(err => {
-                            console.warn('Service Worker kaydı başarısız:', err);
-                        });
-                });
-            }
+            // sw.js ayrı bir dosya gerektirdiğinden tek dosyalı modda devre dışı bırakıldı.
+            // PWA kurulum banner'ı (beforeinstallprompt) yine de çalışmaya devam eder.
 
             // PWA Kurulum tetikleyicisini dinle
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -1340,6 +1331,7 @@ function save() {
             uMsg.textContent = inp.value;
             box.appendChild(uMsg);
             box.scrollTop = box.scrollHeight;
+            let queryText = inp.value;
             inp.value = "";
             
             let bMsg = document.createElement("div");
