@@ -96,6 +96,7 @@
         .action-btn.good { border-left: 4px solid var(--green); }
         .action-btn.easy { border-left: 4px solid var(--blue); }
         .action-btn.undo-btn { border-left: 4px solid var(--purple); flex: 0.55; }
+        .action-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
         
         /* MODE SELECTOR */
         .mode-selector { display: flex; gap: 6px; justify-content: center; padding: 6px 10px 0; flex-wrap: wrap; flex-shrink: 0; }
@@ -378,6 +379,7 @@
         <button class="btn-primary" style="font-size: 12px; padding: 6px 12px;" onclick="document.getElementById('manualCardForm').style.display='flex';" id="openAddCardFormBtn">➕ Yeni Manuel Kart Ekle</button>
         
         <div id="manualCardForm" style="display:none; border: 1px solid var(--border); padding: 12px; border-radius: 12px; flex-direction: column; gap: 8px;">
+            <select id="mcDeckSelect" style="background: var(--surface2); border: 1px solid var(--surface3); padding: 10px 14px; border-radius: 12px; color: var(--text); font-size: 14px; width: 100%;"></select>
             <input type="text" id="mcWord" placeholder="Hollandaca Kelime/İfade *">
             <input type="text" id="mcMeaning" placeholder="Türkçe Anlamı *">
             <input type="text" id="mcSentence" placeholder="Örnek Cümle (Hollandaca)">
@@ -599,6 +601,20 @@
             <div class="stat-card blue"><div class="stat-number" id="statsTotalRepetitions">0</div><div class="stat-label">Tekrarlar</div></div>
             <div class="stat-card red"><div class="stat-number" id="statsTotalErrors">0</div><div class="stat-label">Toplam Hata</div></div>
         </div>
+        <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 700;">🎯 Günlük Hedef</span>
+                <span id="dailyGoalText" style="font-size: 12px; color: var(--orange); font-weight: 700;">0 / 10</span>
+            </div>
+            <div style="background: var(--surface3); border-radius: 8px; height: 8px; overflow: hidden;">
+                <div id="dailyGoalBar" style="height: 100%; background: linear-gradient(90deg, var(--orange), var(--green)); border-radius: 8px; transition: width 0.4s; width: 0%;"></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+                <span style="font-size: 12px; color: var(--subtle);">Hedef:</span>
+                <input type="number" id="dailyGoalInput" min="1" max="200" value="10" style="width: 70px; background: var(--surface3); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; color: var(--text); font-size: 13px;">
+                <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="saveDailyGoal()">Kaydet</button>
+            </div>
+        </div>
         <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('statsModal')">Kapat</button></div>
     </div>
 
@@ -608,6 +624,9 @@
         <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" id="exportDataBtn">📥 Verileri Dışa Aktar (JSON)</button>
         <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="document.getElementById('importFileInput').click()">📤 Verileri İçe Aktar (JSON)</button>
         <input type="file" id="importFileInput" style="display:none;" accept=".json">
+        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px; border-color: var(--green);" onclick="document.getElementById('importCsvInput').click()">📊 Toplu Kart İçe Aktar (CSV)</button>
+        <input type="file" id="importCsvInput" style="display:none;" accept=".csv,.txt">
+        <div style="font-size: 11px; color: var(--subtle); margin-bottom: 8px; padding: 8px; background: var(--surface2); border-radius: 10px;">CSV formatı: <code>kelime,anlam,örnek_cümle</code> (her satır bir kart)</div>
         <button class="btn-danger" style="width:100%;" id="resetApiKeyBtn">🔑 Groq API Anahtarını Sil</button>
         <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('settingsModal')">Kapat</button></div>
     </div>
@@ -683,6 +702,7 @@
             }
             
             setupEventListeners();
+            applyStoredTheme();
             renderSidebar();
             selectDeck(activeDeckId);
             updateGlobalStreak();
@@ -777,6 +797,17 @@ function save() {
 
             const themeBtn = document.getElementById("themeToggleBtn");
             if (themeBtn) themeBtn.onclick = toggleTheme;
+
+            // Deste arama
+            const deckSearchInput = document.getElementById("deckSearch");
+            if (deckSearchInput) {
+                deckSearchInput.oninput = () => {
+                    const q = deckSearchInput.value.toLowerCase();
+                    document.querySelectorAll("#deckListSidebar .sidebar-item").forEach(item => {
+                        item.style.display = item.textContent.toLowerCase().includes(q) ? "" : "none";
+                    });
+                };
+            }
 
             // Drawer shortcuts
             const bindings = {
@@ -929,6 +960,7 @@ function save() {
             // System setup bindings
             document.getElementById("exportDataBtn").onclick = exportSystemData;
             document.getElementById("importFileInput").onchange = importSystemData;
+            document.getElementById("importCsvInput").onchange = importCsvData;
             document.getElementById("resetApiKeyBtn").onclick = resetApiKey;
             
             // Voice Badge voice command
@@ -1042,6 +1074,13 @@ function save() {
             });
         }
 
+        function setActionButtonsState(enabled) {
+            ['btnAgain','btnHard','btnGood','btnEasy','undoBtn'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = !enabled;
+            });
+        }
+
         // CORE STUDY FLOW MECHANICS
         function selectDeck(deckId) {
             let filteredCards = [];
@@ -1056,17 +1095,23 @@ function save() {
             if (filteredCards.length > 0) {
                 currentCard = filteredCards[Math.floor(Math.random() * filteredCards.length)];
                 renderCurrentCardMode();
+                setActionButtonsState(true);
             } else {
                 currentCard = null;
                 document.getElementById("cardFrontWord").textContent = "Kart Yok";
                 document.getElementById("cardBackMeaning").textContent = "Lütfen Bu Desteye Kart Ekleyin";
+                setActionButtonsState(false);
             }
             updateProgress();
         }
 
         function renderCurrentCardMode() {
             if (!currentCard) return;
-            document.getElementById("mainCard").classList.remove("flipped");
+            const cardEl = document.getElementById("mainCard");
+            cardEl.classList.remove("flipped");
+            
+            // Flip animasyonu bittikten sonra içeriği güncelle (450ms transition)
+            setTimeout(() => {
             document.getElementById("cardDeckBadge").textContent = appData.decks.find(d => d.id === currentCard.deckId)?.name || "Genel";
             document.getElementById("cardFrontWord").textContent = currentCard.word;
             document.getElementById("cardBackMeaning").textContent = currentCard.meaning;
@@ -1130,6 +1175,7 @@ function save() {
                 });
                 testArea.appendChild(zone);
             }
+            }, 460);
         }
 
         function checkVerbDrill(e) {
@@ -1152,7 +1198,14 @@ function save() {
 
         function handleAnswer(rating) {
             if(!currentCard) return;
-            sessionHistory.push({ cardId: currentCard.id, action: rating });
+            
+            // Geri alma için mevcut durumu kaydet
+            sessionHistory.push({
+                cardId: currentCard.id,
+                action: rating,
+                prevInterval: currentCard.interval,
+                prevEase: currentCard.ease
+            });
 
             // Basit Spaced Repetition (SM-2 Like) Algoritması
             if (!currentCard.interval) currentCard.interval = 1;
@@ -1192,6 +1245,21 @@ function save() {
                 appData.stats.totalErrors++;
                 currentCard.wrong = (currentCard.wrong || 0) + 1;
             }
+
+            // Günlük tekrar sayacı
+            const todayStr = new Date().toDateString();
+            if (appData.stats.todayDate !== todayStr) {
+                appData.stats.todayDate = todayStr;
+                appData.stats.todayReps = 0;
+            }
+            appData.stats.todayReps = (appData.stats.todayReps || 0) + 1;
+
+            // Günlük hedefe ulaşıldıysa kutla
+            const goal = appData.stats.dailyGoal || 10;
+            if (appData.stats.todayReps === goal) {
+                showToast(`🎉 Günlük hedefinize ulaştınız! ${goal} kart tamamlandı!`, "var(--green)");
+                triggerConfetti();
+            }
             
             currentCard.repetitions = (currentCard.repetitions || 0) + 1;
             
@@ -1201,9 +1269,25 @@ function save() {
         }
 
         function triggerUndo() {
-            if(sessionHistory.length === 0) { showToast("Geri alınacak hamle yok.", "var(--muted)"); return; }
+            if (sessionHistory.length === 0) { showToast("Geri alınacak hamle yok.", "var(--muted)"); return; }
             let last = sessionHistory.pop();
+            
+            // Kartı bul ve istatistiklerini geri al
+            let card = appData.cards.find(c => c.id === last.cardId);
+            if (card) {
+                card.repetitions = Math.max(0, (card.repetitions || 1) - 1);
+                if (last.action === "again") {
+                    appData.stats.totalErrors = Math.max(0, (appData.stats.totalErrors || 1) - 1);
+                    card.wrong = Math.max(0, (card.wrong || 1) - 1);
+                }
+                appData.stats.totalRepetitions = Math.max(0, (appData.stats.totalRepetitions || 1) - 1);
+                // interval ve ease geri al
+                if (last.prevInterval !== undefined) card.interval = last.prevInterval;
+                if (last.prevEase !== undefined) card.ease = last.prevEase;
+                save();
+            }
             showToast("Son hamle geri alındı.", "var(--purple)");
+            selectDeck(activeDeckId);
         }
 
         // TEXT TO SPEECH SERVICE - Safari uyumlu
@@ -1348,19 +1432,27 @@ function save() {
             document.getElementById("podcastOutput").style.display = "block";
             document.getElementById("podcastStatusText").textContent = "Günün yayını akıllı algoritma ile derleniyor...";
             
+            // Önceki onclick bağlantısını temizle (çift tetikleme önleme)
+            const playBtn = document.getElementById("playPodcastBtn");
+            playBtn.onclick = null;
+            playBtn.disabled = true;
+            
             let prompt = `Bizim için Hollandalı Sophie ve Ahmet arasında geçen kısa, 6 satırlık bir podcast diyalogu üret. Konu: Gündelik Hollanda yaşamı. Çıktıyı JSON formatında ver: {"lines": [{"speaker": "Sophie", "text": "Hollandaca konuşma", "translation": "Türkçe çeviri"}, {"speaker": "Ahmet", "text": "Hollandaca konuşma", "translation": "Türkçe çeviri"}]}`;
             let res = await runGroqAi(prompt);
             try {
                 let data = JSON.parse(res);
                 podcastLines = data.lines || [];
-                document.getElementById("podcastStatusText").textContent = "Yayın Hazır!";
-                document.getElementById("playPodcastBtn").onclick = () => {
+                document.getElementById("podcastStatusText").textContent = "Yayın Hazır! (" + podcastLines.length + " satır)";
+                playBtn.disabled = false;
+                playBtn.onclick = () => {
                     podcastCurrentLine = 0;
+                    window.speechSynthesis.cancel();
                     playPodcastLine();
                 };
             } catch (e) {
                 document.getElementById("podcastStatusText").textContent = "Bir hata oluştu, varsayılan dinleme oynatılıyor.";
-                document.getElementById("playPodcastBtn").onclick = () => speakTts("Welkom bij LinguaPrime Podcast Station. Vandaag gaan we het hebben over de Nederlandse cultuur.", "nl-NL");
+                playBtn.disabled = false;
+                playBtn.onclick = () => speakTts("Welkom bij LinguaPrime Podcast Station. Vandaag gaan we het hebben over de Nederlandse cultuur.", "nl-NL");
             }
         }
 
@@ -1769,6 +1861,19 @@ function save() {
         }
 
         // MANAGEMENT SUB-FUNCTIONS
+        function populateManualCardDeckSelect() {
+            const sel = document.getElementById("mcDeckSelect");
+            if (!sel) return;
+            sel.innerHTML = "";
+            appData.decks.forEach(d => {
+                const opt = document.createElement("option");
+                opt.value = d.id;
+                opt.textContent = d.name;
+                if (d.id === activeDeckId) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
         function populateCardManageDeckFilter() {
             const sel = document.getElementById("cardManageDeckFilter");
             if (!sel) return;
@@ -1799,7 +1904,10 @@ function save() {
                 tr.innerHTML = `
                     <td>${c.word}</td>
                     <td>${c.meaning}</td>
-                    <td><button class="delete-deck-btn" onclick="deleteCard('${c.id}', event)" style="color:var(--red);">🗑</button></td>
+                    <td style="display:flex; gap:4px;">
+                        <button class="edit-deck-btn" onclick="editCard('${c.id}', event)" style="color:var(--blue);">✏️</button>
+                        <button class="delete-deck-btn" onclick="deleteCard('${c.id}', event)" style="color:var(--red);">🗑</button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1807,6 +1915,42 @@ function save() {
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--subtle);">Kart bulunamadı.</td></tr>`;
             }
+        }
+
+        function editCard(cardId, event) {
+            event.stopPropagation();
+            const card = appData.cards.find(c => c.id === cardId);
+            if (!card) return;
+
+            // Formu aç ve mevcut değerleri doldur
+            const form = document.getElementById("manualCardForm");
+            form.style.display = "flex";
+            populateManualCardDeckSelect();
+            document.getElementById("mcWord").value = card.word;
+            document.getElementById("mcMeaning").value = card.meaning;
+            document.getElementById("mcSentence").value = card.sentence || "";
+            document.getElementById("mcConjugation").value = card.modalConjugation || "";
+            const sel = document.getElementById("mcDeckSelect");
+            if (sel) sel.value = card.deckId;
+
+            // Kaydet butonunu düzenleme moduna al
+            const saveBtn = document.getElementById("saveManualCardBtn");
+            saveBtn.textContent = "Güncelle";
+            saveBtn.onclick = () => {
+                card.word = document.getElementById("mcWord").value.trim();
+                card.meaning = document.getElementById("mcMeaning").value.trim();
+                card.sentence = document.getElementById("mcSentence").value.trim();
+                card.modalConjugation = document.getElementById("mcConjugation").value.trim();
+                card.deckId = document.getElementById("mcDeckSelect")?.value || card.deckId;
+                if (!card.word || !card.meaning) { showToast("Kelime ve anlam zorunludur.", "var(--red)"); return; }
+                save();
+                form.style.display = "none";
+                saveBtn.textContent = "Kaydet";
+                saveBtn.onclick = addNewCardManual;
+                renderManageCardsTable();
+                showToast("Kart güncellendi.", "var(--green)");
+            };
+            form.scrollIntoView({ behavior: "smooth" });
         }
 
         function deleteCard(cardId, event) {
@@ -1840,12 +1984,13 @@ function save() {
             let m = document.getElementById("mcMeaning").value.trim();
             let sStr = document.getElementById("mcSentence").value.trim();
             let cStr = document.getElementById("mcConjugation").value.trim();
+            let targetDeckId = document.getElementById("mcDeckSelect")?.value || activeDeckId;
             
             if(!w || !m) { showToast("Kelime ve anlam alanları zorunludur.", "var(--red)"); return; }
             
             appData.cards.push({
                 id: "c_" + Date.now(),
-                deckId: activeDeckId,
+                deckId: targetDeckId,
                 word: w,
                 meaning: m,
                 sentence: sStr,
@@ -1894,10 +2039,28 @@ function save() {
             document.body.classList.toggle("light");
             let isLight = document.body.classList.contains("light");
             document.getElementById("themeToggleBtn").textContent = isLight ? "🌙 Karanlık Mod" : "☀️ Işık Modu";
+            localStorage.setItem("linguaprime_theme", isLight ? "light" : "dark");
+        }
+
+        function applyStoredTheme() {
+            const saved = localStorage.getItem("linguaprime_theme");
+            if (saved === "light") {
+                document.body.classList.add("light");
+                const btn = document.getElementById("themeToggleBtn");
+                if (btn) btn.textContent = "🌙 Karanlık Mod";
+            }
         }
 
         function updateGlobalStreak() {
             document.getElementById("streakCount").textContent = appData.stats.streak || 0;
+        }
+
+        function saveDailyGoal() {
+            const val = parseInt(document.getElementById("dailyGoalInput").value) || 10;
+            appData.stats.dailyGoal = val;
+            save();
+            updateProgress();
+            showToast(`Günlük hedef ${val} kart olarak ayarlandı.`, "var(--green)");
         }
 
         function updateProgress() {
@@ -1910,7 +2073,6 @@ function save() {
                 currentAreaCount = appData.cards.filter(c => c.deckId === activeDeckId).length;
             }
 
-            // Gerçek İlerleme Hesaplama (En az 1 kez doğru bilinen kartlar)
             const learnedCount = appData.cards.filter(c => (c.repetitions || 0) > 0).length;
             const progressPercent = appData.cards.length > 0 ? (learnedCount / appData.cards.length) * 100 : 0;
 
@@ -1920,6 +2082,17 @@ function save() {
             document.getElementById("statsTotalErrors").textContent = appData.stats.totalErrors;
             document.getElementById("progressText").textContent = `Mevcut çalışma alanında toplam ${currentAreaCount} kart aktif`;
             document.getElementById("progressBarFill").style.width = `${progressPercent}%`;
+
+            // Günlük hedef güncelle
+            const goal = appData.stats.dailyGoal || 10;
+            const todayReps = appData.stats.todayReps || 0;
+            const goalPercent = Math.min((todayReps / goal) * 100, 100);
+            const goalBar = document.getElementById("dailyGoalBar");
+            const goalText = document.getElementById("dailyGoalText");
+            const goalInput = document.getElementById("dailyGoalInput");
+            if (goalBar) goalBar.style.width = `${goalPercent}%`;
+            if (goalText) goalText.textContent = `${todayReps} / ${goal}`;
+            if (goalInput) goalInput.value = goal;
         }
 
         // SYSTEM BACKUP MANAGER
@@ -1932,6 +2105,38 @@ function save() {
             document.body.appendChild(a);
             a.click();
             setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+        }
+
+        function importCsvData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const lines = evt.target.result.split(/\r?\n/).filter(l => l.trim());
+                let added = 0, skipped = 0;
+                lines.forEach(line => {
+                    const parts = line.split(",").map(p => p.trim());
+                    if (parts.length >= 2 && parts[0] && parts[1]) {
+                        appData.cards.push({
+                            id: "c_" + Date.now() + "_" + Math.random().toString(36).slice(2,6),
+                            deckId: activeDeckId !== "all" && activeDeckId !== "multi" ? activeDeckId : appData.decks[0]?.id || "genel",
+                            word: parts[0],
+                            meaning: parts[1],
+                            sentence: parts[2] || "",
+                            repetitions: 0, wrong: 0
+                        });
+                        added++;
+                    } else {
+                        skipped++;
+                    }
+                });
+                save();
+                renderSidebar();
+                selectDeck(activeDeckId);
+                showToast(`${added} kart eklendi${skipped > 0 ? ", " + skipped + " satır atlandı" : ""}.`, "var(--green)");
+                e.target.value = "";
+            };
+            reader.readAsText(file);
         }
 
         function importSystemData(e) {
@@ -1986,6 +2191,7 @@ function save() {
             } else if(id === "manageCardsModal") {
                 renderManageCardsTable();
                 populateCardManageDeckFilter();
+                populateManualCardDeckSelect();
             } else if(id === "statsModal") {
                 updateProgress();
             }
