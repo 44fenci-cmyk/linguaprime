@@ -73,12 +73,12 @@
         .main { height: 100%; height: -webkit-fill-available; display: flex; flex-direction: column; overflow: hidden; padding-top: calc(70px + env(safe-area-inset-top)); }
         .card-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 16px 4px; position: relative; min-height: 0; }
         .card-container { width: 100%; max-width: 560px; -webkit-perspective: 1400px; perspective: 1400px; }
-        .card { width: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; -webkit-transition: -webkit-transform 0.45s cubic-bezier(.4,0,.2,1); transition: transform 0.45s cubic-bezier(.4,0,.2,1), -webkit-transform 0.45s cubic-bezier(.4,0,.2,1); cursor: pointer; border-radius: var(--radius); }
+        .card { width: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; -webkit-transition: -webkit-transform 0.5s cubic-bezier(.4,0,.2,1); transition: transform 0.5s cubic-bezier(.4,0,.2,1), -webkit-transform 0.5s cubic-bezier(.4,0,.2,1); cursor: pointer; border-radius: var(--radius); }
         .card.flipped { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
-        .card-face { -webkit-backface-visibility: hidden; backface-visibility: hidden; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 24px; min-height: clamp(220px, 42vh, 380px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+        .card-face { -webkit-backface-visibility: hidden; backface-visibility: hidden; -webkit-transform: translateZ(0); background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 24px; min-height: clamp(220px, 42vh, 380px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
         body.light .card-face { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
-        .card-front { -webkit-transform: rotateY(0deg); transform: rotateY(0deg); }
-        .card-back { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+        .card-front { -webkit-transform: rotateY(0deg) translateZ(1px); transform: rotateY(0deg) translateZ(1px); }
+        .card-back { -webkit-transform: rotateY(180deg) translateZ(1px); transform: rotateY(180deg) translateZ(1px); position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; }
         .word { font-size: 32px; font-weight: 800; margin: 12px 0; line-height: 1.25; letter-spacing: -0.5px; }
         .meaning { font-size: 20px; font-weight: 600; color: var(--orange); margin: 8px 0; }
         .sentence { font-size: 14px; color: var(--subtle); font-style: italic; margin-top: 10px; max-width: 90%; }
@@ -97,6 +97,31 @@
         .action-btn.easy { border-left: 4px solid var(--blue); }
         .action-btn.undo-btn { border-left: 4px solid var(--purple); flex: 0.55; }
         .action-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
+
+        /* ÇIFT YÖN & YAZARAK ÖĞRENME */
+        .direction-toggle { display: flex; align-items: center; gap: 6px; justify-content: center; padding: 4px 10px 0; flex-shrink: 0; }
+        .direction-btn { padding: 5px 12px; border-radius: 16px; background: var(--surface2); border: 1px solid var(--border); color: var(--subtle); font-size: 11px; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+        .direction-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+        .type-input-area { width: 100%; margin-top: 12px; display: flex; gap: 8px; flex-direction: column; align-items: center; }
+        .type-input { width: 100%; max-width: 340px; background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 12px 16px; color: var(--text); font-size: 16px; text-align: center; transition: border-color 0.2s; }
+        .type-input:focus { outline: none; border-color: var(--orange); }
+        .type-input.correct { border-color: var(--green); background: rgba(34,197,94,0.08); }
+        .type-input.wrong { border-color: var(--red); background: rgba(239,68,68,0.08); }
+        .type-hint { font-size: 12px; color: var(--subtle); margin-top: 4px; }
+
+        /* HAFTALIK GRAFİK */
+        .week-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 8px 4px 0; }
+        .week-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+        .week-bar { width: 100%; background: var(--orange); border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.4s ease; }
+        .week-bar.today { background: var(--green); }
+        .week-label { font-size: 9px; color: var(--subtle); font-weight: 700; }
+        .week-val { font-size: 9px; color: var(--subtle); }
+
+        /* DESTE RENK ETİKETİ */
+        .deck-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; display: inline-block; margin-right: 4px; }
+
+        /* KLAVYE KİSAYOL BADGE */
+        .kbd { display: inline-block; background: var(--surface3); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; font-size: 10px; font-family: 'Space Mono', monospace; color: var(--subtle); margin-left: 4px; }
         
         /* MODE SELECTOR */
         .mode-selector { display: flex; gap: 6px; justify-content: center; padding: 6px 10px 0; flex-wrap: wrap; flex-shrink: 0; }
@@ -286,6 +311,7 @@
         <div class="deck-list-container" id="deckListSidebar"></div>
         
         <div class="sidebar-footer">
+            <div class="sidebar-item" id="aiCardGenBtn">🤖 AI Otomatik Kart Üretici</div>
             <div class="sidebar-item" id="addDeckBtn">➕ Yeni Deste Oluştur</div>
             <div class="sidebar-item" id="manageCardsBtn">📋 Kart Yönetim Paneli</div>
             <div class="sidebar-item" id="kesfetBtn">🔍 Klasik Akıllı Flashcard</div>
@@ -315,11 +341,19 @@
     <div class="main">
         <div class="mode-selector">
             <button class="mode-btn active" data-mode="classic">Flashcard</button>
+            <button class="mode-btn" data-mode="typing">Yazarak Öğren</button>
             <button class="mode-btn" data-mode="hint">Harf İpucu</button>
             <button class="mode-btn" data-mode="mcq">Çoktan Seçmeli</button>
-            <button class="mode-btn" data-mode="verbdrill">Fiil Çekim Drill</button>
-            <button class="mode-btn" data-mode="grammarfill">Boşluk Doldurma</button>
+            <button class="mode-btn" data-mode="verbdrill">Fiil Çekim</button>
+            <button class="mode-btn" data-mode="grammarfill">Artikel</button>
             <button class="mode-btn" data-mode="woordvolgorde">Cümle Düzeni</button>
+        </div>
+
+        <div class="direction-toggle">
+            <span style="font-size:11px; color:var(--subtle); font-weight:600;">Yön:</span>
+            <button class="direction-btn active" id="dirNL2TR" title="Hollandaca → Türkçe">NL → TR</button>
+            <button class="direction-btn" id="dirTR2NL" title="Türkçe → Hollandaca">TR → NL</button>
+            <button class="direction-btn" id="dirRandom" title="Rastgele yön">🔀 Rastgele</button>
         </div>
 
         <div class="progress-bar-container">
@@ -344,9 +378,21 @@
                         <div class="meaning" id="cardBackMeaning">Deste Seçin veya Kart Ekleyin</div>
                         <div class="sentence" id="cardBackSentence">Örnek cümle burada görünecektir.</div>
                         <button class="tts-btn" id="backTTSBtn">🔊 Anlamı Oku (TR)</button>
+                        <div id="cardAccuracyBadge" style="margin-top:10px; font-size:11px; color:var(--subtle); font-weight:600;"></div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div style="text-align:center; padding: 2px 14px 0; flex-shrink:0;">
+            <span style="font-size:10px; color:var(--muted);">
+                <span class="kbd">Space</span> Çevir &nbsp;
+                <span class="kbd">1</span>Tekrar &nbsp;
+                <span class="kbd">2</span>Zor &nbsp;
+                <span class="kbd">3</span>İyi &nbsp;
+                <span class="kbd">4</span>Kolay &nbsp;
+                <span class="kbd">Z</span>Geri Al
+            </span>
         </div>
 
         <div class="action-bar">
@@ -363,6 +409,19 @@
     <div class="modal" id="addDeckModal">
         <h3>➕ Yeni Deste Oluştur</h3>
         <input type="text" id="newDeckNameInput" placeholder="Deste adı girin (Örn: Seyahat Kelimeleri)...">
+        <div style="display:flex; gap:8px; align-items:center;">
+            <label style="font-size:12px; color:var(--subtle); white-space:nowrap;">Renk:</label>
+            <div id="deckColorPicker" style="display:flex; gap:6px; flex-wrap:wrap;">
+                <span class="deck-color-opt" data-color="#F97316" style="background:#F97316; width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid white;"></span>
+                <span class="deck-color-opt" data-color="#3B82F6" style="background:#3B82F6; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
+                <span class="deck-color-opt" data-color="#22C55E" style="background:#22C55E; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
+                <span class="deck-color-opt" data-color="#8B5CF6" style="background:#8B5CF6; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
+                <span class="deck-color-opt" data-color="#EF4444" style="background:#EF4444; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
+                <span class="deck-color-opt" data-color="#F59E0B" style="background:#F59E0B; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
+            </div>
+            <label style="font-size:12px; color:var(--subtle); white-space:nowrap; margin-left:8px;">Emoji:</label>
+            <input type="text" id="newDeckEmoji" placeholder="📁" style="width:50px; text-align:center; font-size:18px;">
+        </div>
         <div class="modal-buttons">
             <button class="btn-secondary" onclick="closeModal('addDeckModal')">İptal</button>
             <button class="btn-primary" id="saveNewDeckBtn">Oluştur</button>
@@ -602,6 +661,10 @@
             <div class="stat-card red"><div class="stat-number" id="statsTotalErrors">0</div><div class="stat-label">Toplam Hata</div></div>
         </div>
         <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border);">
+            <div style="font-size:12px; font-weight:700; margin-bottom:6px; color:var(--subtle);">📅 Son 7 Gün</div>
+            <div class="week-chart" id="weekChart"></div>
+        </div>
+        <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <span style="font-size: 13px; font-weight: 700;">🎯 Günlük Hedef</span>
                 <span id="dailyGoalText" style="font-size: 12px; color: var(--orange); font-weight: 700;">0 / 10</span>
@@ -641,6 +704,31 @@
         </div>
     </div>
 
+    <!-- 23. AI KART ÜRETİCİ MODAL -->
+    <div class="modal" id="aiCardGenModal">
+        <h3>🤖 AI Otomatik Kart Üretici</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <input type="text" id="aiGenTopic" placeholder="Konu (Örn: renkler, yiyecekler...)">
+            <select id="aiGenLevel">
+                <option value="A1">A1 Başlangıç</option>
+                <option value="A2">A2 Temel</option>
+                <option value="B1" selected>B1 Orta</option>
+                <option value="B2">B2 Üst Orta</option>
+            </select>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <label style="font-size:12px; color:var(--subtle); white-space:nowrap;">Kart sayısı:</label>
+            <input type="number" id="aiGenCount" value="10" min="3" max="30" style="width:70px;">
+            <select id="aiGenDeckTarget" style="flex:1;"></select>
+        </div>
+        <button class="ai-btn" id="aiGenCardsBtn" style="width:100%; justify-content:center;">✨ Kartları Üret</button>
+        <div id="aiGenPreview" style="display:none; max-height:220px; overflow-y:auto; flex-direction:column; gap:6px; -webkit-overflow-scrolling:touch;"></div>
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="closeModal('aiCardGenModal')">Kapat</button>
+            <button class="btn-primary" id="aiGenSaveBtn" style="display:none;" onclick="saveAiGeneratedCards()">💾 Tümünü Kaydet</button>
+        </div>
+    </div>
+
     <!-- PERSISTENT APP STATE SCRIPT ARCHITECTURE -->
     <script>
         // CORE APPLICATION DATABASE ENGINE (Mevcut CSV yapısıyla tam uyumlu)
@@ -666,6 +754,7 @@
         let currentCard = null;
         let activeDeckId = "genel";
         let activeMode = "classic";
+        let studyDirection = "NL2TR"; // NL2TR | TR2NL | random
         let sessionHistory = [];
         let matchingSelected = null;
         let matchingAnswers = {};
@@ -798,6 +887,18 @@ function save() {
             const themeBtn = document.getElementById("themeToggleBtn");
             if (themeBtn) themeBtn.onclick = toggleTheme;
 
+            // Deste renk seçici
+            document.addEventListener("click", (e) => {
+                if (e.target.classList.contains("deck-color-opt")) {
+                    document.querySelectorAll(".deck-color-opt").forEach(el => {
+                        el.style.border = "none";
+                        el.removeAttribute("data-selected");
+                    });
+                    e.target.style.border = "3px solid white";
+                    e.target.setAttribute("data-selected", "true");
+                }
+            });
+
             // Deste arama
             const deckSearchInput = document.getElementById("deckSearch");
             if (deckSearchInput) {
@@ -811,6 +912,7 @@ function save() {
 
             // Drawer shortcuts
             const bindings = {
+                "aiCardGenBtn": () => { openModal("aiCardGenModal"); populateAiGenDeckTarget(); },
                 "addDeckBtn": () => openModal("addDeckModal"),
                 "manageCardsBtn": () => openModal("manageCardsModal"),
                 "quickAddBtn": () => { openModal("manageCardsModal"); document.getElementById("manualCardForm").style.display="flex"; },
@@ -931,7 +1033,39 @@ function save() {
                 card.addEventListener('touchend', onTouchEnd, { passive: true });
             })();
 
-            // Mode Switching Action
+            // Çift yönlü çalışma yön seçimi
+            ["dirNL2TR","dirTR2NL","dirRandom"].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.onclick = () => {
+                    document.querySelectorAll(".direction-btn").forEach(b => b.classList.remove("active"));
+                    el.classList.add("active");
+                    studyDirection = id === "dirNL2TR" ? "NL2TR" : id === "dirTR2NL" ? "TR2NL" : "random";
+                    renderCurrentCardMode();
+                };
+            });
+
+            // Klavye kısayolları
+            document.addEventListener("keydown", (e) => {
+                // Modal açıksa veya input odaklanmışsa çalıştırma
+                if (document.querySelector(".modal.open")) return;
+                if (["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)) return;
+                switch(e.key) {
+                    case " ": case "Enter":
+                        e.preventDefault();
+                        document.getElementById("mainCard").classList.toggle("flipped");
+                        break;
+                    case "1": handleAnswer("again"); break;
+                    case "2": handleAnswer("hard"); break;
+                    case "3": handleAnswer("good"); break;
+                    case "4": handleAnswer("easy"); break;
+                    case "z": case "Z": triggerUndo(); break;
+                    case "ArrowLeft": handleAnswer("again"); break;
+                    case "ArrowRight": handleAnswer("good"); break;
+                }
+            });
+
+            // Mod seçimi
             document.querySelectorAll(".mode-btn").forEach(btn => {
                 btn.onclick = (e) => {
                     document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
@@ -942,6 +1076,7 @@ function save() {
             });
 
             // Advanced AI Request Bindings
+            document.getElementById("aiGenCardsBtn").onclick = handleAiCardGeneration;
             document.getElementById("generateStoryBtn").onclick = handleStoryAi;
             document.getElementById("checkCorrectionBtn").onclick = handleSentenceCorrection;
             document.getElementById("searchAiDictBtn").onclick = handleAiDictionary;
@@ -1013,8 +1148,13 @@ function save() {
                 const count = appData.cards.filter(c => c.deckId === deck.id).length;
                 const item = document.createElement("div");
                 item.className = `sidebar-item ${deck.id === activeDeckId ? 'active' : ''}`;
+                const color = deck.color || "#F97316";
+                const emoji = deck.emoji || "📁";
                 item.innerHTML = `
-                    <span>📁 ${deck.name} (${count})</span>
+                    <span style="display:flex; align-items:center; gap:6px;">
+                        <span class="deck-color-dot" style="background:${color};"></span>
+                        ${emoji} ${deck.name} <span style="opacity:0.6; font-size:11px;">(${count})</span>
+                    </span>
                     <div class="sidebar-item-actions">
                         <button class="delete-deck-btn" onclick="deleteDeck('${deck.id}', event)">🗑</button>
                     </div>
@@ -1081,21 +1221,37 @@ function save() {
             });
         }
 
+        function getDueCards(cards) {
+            const now = Date.now();
+            // nextReview yoksa veya geçmişse göster
+            return cards.filter(c => !c.nextReview || c.nextReview <= now);
+        }
+
         // CORE STUDY FLOW MECHANICS
         function selectDeck(deckId) {
-            let filteredCards = [];
+            let allFiltered = [];
             if (deckId === "all") {
-                filteredCards = appData.cards;
+                allFiltered = appData.cards;
             } else if (deckId === "multi") {
-                filteredCards = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId));
+                allFiltered = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId));
             } else {
-                filteredCards = appData.cards.filter(c => c.deckId === deckId);
+                allFiltered = appData.cards.filter(c => c.deckId === deckId);
             }
+
+            // Önce vadesi gelenler, yoksa tüm kartlar
+            let filteredCards = getDueCards(allFiltered);
+            if (filteredCards.length === 0) filteredCards = allFiltered;
 
             if (filteredCards.length > 0) {
                 currentCard = filteredCards[Math.floor(Math.random() * filteredCards.length)];
                 renderCurrentCardMode();
                 setActionButtonsState(true);
+                // Progress text: kaç kart vadesi gelmiş
+                const dueCount = getDueCards(allFiltered).length;
+                document.getElementById("progressText").textContent =
+                    dueCount > 0
+                        ? `📚 ${dueCount} kart tekrar zamanı geldi (toplam ${allFiltered.length})`
+                        : `✅ Tüm kartlar güncel! (${allFiltered.length} kart)`;
             } else {
                 currentCard = null;
                 document.getElementById("cardFrontWord").textContent = "Kart Yok";
@@ -1109,72 +1265,143 @@ function save() {
             if (!currentCard) return;
             const cardEl = document.getElementById("mainCard");
             cardEl.classList.remove("flipped");
-            
-            // Flip animasyonu bittikten sonra içeriği güncelle (450ms transition)
-            setTimeout(() => {
-            document.getElementById("cardDeckBadge").textContent = appData.decks.find(d => d.id === currentCard.deckId)?.name || "Genel";
-            document.getElementById("cardFrontWord").textContent = currentCard.word;
-            document.getElementById("cardBackMeaning").textContent = currentCard.meaning;
-            document.getElementById("cardBackSentence").textContent = currentCard.sentence || "Örnek cümle bulunmuyor.";
-            
-            const testArea = document.getElementById("testArea");
-            testArea.innerHTML = "";
 
-            if (activeMode === "hint") {
-                let mask = currentCard.word.replace(/[a-zA-Z]/g, "_ ");
-                testArea.innerHTML = `<div style="font-family:'Space Mono'; color:var(--orange); font-weight:700;">İpucu: ${mask}</div>`;
-            } else if (activeMode === "mcq") {
-                const options = [currentCard.meaning];
-                let pool = appData.cards.filter(c => c.id !== currentCard.id).map(c => c.meaning);
-                while(options.length < 3 && pool.length > 0) {
-                    let rand = pool.splice(Math.floor(Math.random()*pool.length), 1)[0];
-                    if(!options.includes(rand)) options.push(rand);
+            // Yönü belirle
+            let dir = studyDirection;
+            if (dir === "random") dir = Math.random() > 0.5 ? "NL2TR" : "TR2NL";
+            const isReversed = (dir === "TR2NL");
+
+            // Ön yüz: NL2TR → Hollandaca, TR2NL → Türkçe
+            const frontText  = isReversed ? currentCard.meaning : currentCard.word;
+            const backText   = isReversed ? currentCard.word    : currentCard.meaning;
+            const frontLang  = isReversed ? "TR" : "NL";
+            const backLang   = isReversed ? "NL" : "TR";
+            const frontTTS   = isReversed ? "tr-TR" : "nl-NL";
+            const backTTS    = isReversed ? "nl-NL" : "tr-TR";
+
+            setTimeout(() => {
+                document.getElementById("cardDeckBadge").textContent = appData.decks.find(d => d.id === currentCard.deckId)?.name || "Genel";
+                document.getElementById("cardFrontWord").textContent = frontText;
+                document.getElementById("cardBackMeaning").textContent = backText;
+                document.getElementById("cardBackSentence").textContent = currentCard.sentence || "Örnek cümle bulunmuyor.";
+                // Doğruluk oranı
+                const totalAns = (currentCard.repetitions || 0) + (currentCard.wrong || 0);
+                const accuracy = totalAns > 0 ? Math.round((1 - (currentCard.wrong || 0) / totalAns) * 100) : null;
+                const accBadge = document.getElementById("cardAccuracyBadge");
+                if (accBadge) {
+                    accBadge.textContent = accuracy !== null
+                        ? `Doğruluk: %${accuracy} · ${totalAns} tekrar · EF: ${(currentCard.ease||2.5).toFixed(1)}`
+                        : "Henüz çalışılmadı";
+                    accBadge.style.color = accuracy === null ? "var(--subtle)" : accuracy >= 80 ? "var(--green)" : accuracy >= 50 ? "var(--orange)" : "var(--red)";
                 }
-                options.sort(() => Math.random() - 0.5);
-                options.forEach(opt => {
-                    const btn = document.createElement("button");
-                    btn.className = "btn-secondary";
-                    btn.style.width = "100%";
-                    btn.style.marginTop = "4px";
-                    btn.textContent = opt;
-                    btn.onclick = (e) => {
-                        e.stopPropagation();
-                        if (opt === currentCard.meaning) { showToast("Doğru!", "var(--green)"); document.getElementById("mainCard").classList.add("flipped"); }
-                        else showToast("Yanlış cevap!", "var(--red)");
+                document.getElementById("frontTTSBtn").textContent = `🔊 Telaffuz (${frontLang})`;
+                document.getElementById("frontTTSBtn").onclick = (e) => { e.stopPropagation(); speakTts(frontText, frontTTS); };
+                document.getElementById("backTTSBtn").textContent = `🔊 Oku (${backLang})`;
+                document.getElementById("backTTSBtn").onclick = (e) => { e.stopPropagation(); speakTts(backText, backTTS); };
+
+                const testArea = document.getElementById("testArea");
+                testArea.innerHTML = "";
+
+                if (activeMode === "typing") {
+                    // Yazarak öğrenme: ön yüzde sorulan şeyin cevabını yaz
+                    const inp = document.createElement("input");
+                    inp.type = "text";
+                    inp.className = "type-input";
+                    inp.placeholder = `${backLang} karşılığını yazın...`;
+                    inp.autocomplete = "off";
+                    inp.autocorrect = "off";
+                    inp.autocapitalize = "off";
+                    inp.spellcheck = false;
+                    const hint = document.createElement("div");
+                    hint.className = "type-hint";
+                    hint.textContent = `${backText.length} karakter`;
+                    const checkBtn = document.createElement("button");
+                    checkBtn.className = "btn-primary";
+                    checkBtn.style.cssText = "margin-top:8px; width:100%; max-width:340px;";
+                    checkBtn.textContent = "Kontrol Et ↵";
+                    const checkTyping = () => {
+                        const val = inp.value.trim().toLowerCase();
+                        const correct = backText.trim().toLowerCase();
+                        if (val === correct) {
+                            inp.className = "type-input correct";
+                            showToast("✓ Doğru!", "var(--green)");
+                            cardEl.classList.add("flipped");
+                            handleAnswer("good");
+                        } else {
+                            inp.className = "type-input wrong";
+                            hint.textContent = `Doğru cevap: ${backText}`;
+                            hint.style.color = "var(--red)";
+                            showToast("✗ Yanlış!", "var(--red)");
+                        }
                     };
-                    testArea.appendChild(btn);
-                });
-            } else if (activeMode === "verbdrill") {
-                testArea.innerHTML = `
-                    <div class="verb-drill-grid">
-                        <div class="verb-drill-row"><span class="verb-person">ik</span><input type="text" class="verb-input" id="v1"></div>
-                        <div class="verb-drill-row"><span class="verb-person">jij</span><input type="text" class="verb-input" id="v2"></div>
-                        <div class="verb-drill-row"><span class="verb-person">wij</span><input type="text" class="verb-input" id="v3"></div>
-                    </div>
-                    <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="checkVerbDrill(event)">Kontrol Et</button>
-                `;
-            } else if (activeMode === "grammarfill") {
-                let isDe = currentCard.word.startsWith("de");
-                testArea.innerHTML = `
-                    <div class="grammar-options">
-                        <button class="grammar-opt-btn" onclick="checkGrammarFill('de', ${isDe}, event)">de</button>
-                        <button class="grammar-opt-btn" onclick="checkGrammarFill('het', ${!isDe}, event)">het</button>
-                    </div>
-                `;
-            } else if (activeMode === "woordvolgorde") {
-                if(!currentCard.sentence) { testArea.innerHTML="Cümle mevcut değil."; return; }
-                let words = currentCard.sentence.split(" ").sort(() => Math.random() - 0.5);
-                let zone = document.createElement("div");
-                zone.className = "woordvolgorde-zone";
-                words.forEach(w => {
-                    let wordSpan = document.createElement("span");
-                    wordSpan.className = "wv-word";
-                    wordSpan.textContent = w;
-                    wordSpan.onclick = (e) => { e.stopPropagation(); wordSpan.classList.toggle("placed"); };
-                    zone.appendChild(wordSpan);
-                });
-                testArea.appendChild(zone);
-            }
+                    checkBtn.onclick = (e) => { e.stopPropagation(); checkTyping(); };
+                    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); checkTyping(); } });
+                    const wrap = document.createElement("div");
+                    wrap.className = "type-input-area";
+                    wrap.appendChild(inp);
+                    wrap.appendChild(hint);
+                    wrap.appendChild(checkBtn);
+                    testArea.appendChild(wrap);
+                    setTimeout(() => inp.focus(), 50);
+                } else if (activeMode === "hint") {
+                    let mask = frontText.replace(/[a-zA-ZğüşıöçĞÜŞİÖÇ]/g, "_ ");
+                    testArea.innerHTML = `<div style="font-family:'Space Mono'; color:var(--orange); font-weight:700; font-size:14px; letter-spacing:2px;">İpucu: ${mask}</div>`;
+                } else if (activeMode === "mcq") {
+                    const correct = backText;
+                    const pool = appData.cards.filter(c => c.id !== currentCard.id).map(c => isReversed ? c.word : c.meaning);
+                    const options = [correct];
+                    const shuffled = pool.sort(() => Math.random() - 0.5);
+                    for (let p of shuffled) { if (!options.includes(p)) { options.push(p); if (options.length >= 4) break; } }
+                    options.sort(() => Math.random() - 0.5);
+                    options.forEach(opt => {
+                        const btn = document.createElement("button");
+                        btn.className = "btn-secondary";
+                        btn.style.cssText = "width:100%; margin-top:6px; text-align:left; padding:10px 14px;";
+                        btn.textContent = opt;
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            if (opt === correct) {
+                                btn.style.background = "var(--green)"; btn.style.color = "white";
+                                showToast("✓ Doğru!", "var(--green)");
+                                cardEl.classList.add("flipped");
+                            } else {
+                                btn.style.background = "var(--red)"; btn.style.color = "white";
+                                showToast("✗ Yanlış!", "var(--red)");
+                            }
+                        };
+                        testArea.appendChild(btn);
+                    });
+                } else if (activeMode === "verbdrill") {
+                    testArea.innerHTML = `
+                        <div class="verb-drill-grid">
+                            <div class="verb-drill-row"><span class="verb-person">ik</span><input type="text" class="verb-input" id="v1"></div>
+                            <div class="verb-drill-row"><span class="verb-person">jij</span><input type="text" class="verb-input" id="v2"></div>
+                            <div class="verb-drill-row"><span class="verb-person">wij</span><input type="text" class="verb-input" id="v3"></div>
+                        </div>
+                        <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="checkVerbDrill(event)">Kontrol Et</button>
+                    `;
+                } else if (activeMode === "grammarfill") {
+                    let isDe = currentCard.word.startsWith("de");
+                    testArea.innerHTML = `
+                        <div class="grammar-options">
+                            <button class="grammar-opt-btn" onclick="checkGrammarFill('de', ${isDe}, event)">de</button>
+                            <button class="grammar-opt-btn" onclick="checkGrammarFill('het', ${!isDe}, event)">het</button>
+                        </div>
+                    `;
+                } else if (activeMode === "woordvolgorde") {
+                    if (!currentCard.sentence) { testArea.innerHTML = "Cümle mevcut değil."; return; }
+                    let words = currentCard.sentence.split(" ").sort(() => Math.random() - 0.5);
+                    let zone = document.createElement("div");
+                    zone.className = "woordvolgorde-zone";
+                    words.forEach(w => {
+                        let wordSpan = document.createElement("span");
+                        wordSpan.className = "wv-word";
+                        wordSpan.textContent = w;
+                        wordSpan.onclick = (e) => { e.stopPropagation(); wordSpan.classList.toggle("placed"); };
+                        zone.appendChild(wordSpan);
+                    });
+                    testArea.appendChild(zone);
+                }
             }, 460);
         }
 
@@ -1197,8 +1424,8 @@ function save() {
         }
 
         function handleAnswer(rating) {
-            if(!currentCard) return;
-            
+            if (!currentCard) return;
+
             // Geri alma için mevcut durumu kaydet
             sessionHistory.push({
                 cardId: currentCard.id,
@@ -1207,46 +1434,46 @@ function save() {
                 prevEase: currentCard.ease
             });
 
-            // Basit Spaced Repetition (SM-2 Like) Algoritması
+            // ---- GERÇEK SM-2 ALGORİTMASI ----
             if (!currentCard.interval) currentCard.interval = 1;
             if (!currentCard.ease) currentCard.ease = 2.5;
+            if (!currentCard.repetitions) currentCard.repetitions = 0;
 
-            if (rating === "again") {
+            const q = { again: 0, hard: 2, good: 4, easy: 5 }[rating];
+
+            if (q < 3) {
+                // Tekrar: başa dön
                 currentCard.interval = 1;
-            } else if (rating === "hard") {
-                currentCard.interval *= 1.2;
-                currentCard.ease = Math.max(1.3, currentCard.ease - 0.15);
-            } else if (rating === "good") {
-                currentCard.interval *= currentCard.ease;
-            } else if (rating === "easy") {
-                currentCard.interval *= (currentCard.ease * 1.3);
-                currentCard.ease += 0.15;
+                currentCard.repetitions = 0;
+            } else {
+                if (currentCard.repetitions === 0) currentCard.interval = 1;
+                else if (currentCard.repetitions === 1) currentCard.interval = 6;
+                else currentCard.interval = Math.round(currentCard.interval * currentCard.ease);
+                currentCard.repetitions++;
             }
-            
-            currentCard.nextReview = Date.now() + (currentCard.interval * 24 * 60 * 60 * 1000);
+            // EF güncelle: EF' = EF + (0.1 - (5-q) * (0.08 + (5-q) * 0.02))
+            currentCard.ease = Math.max(1.3, currentCard.ease + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+            currentCard.nextReview = Date.now() + currentCard.interval * 86400000;
+            // ----------------------------------
 
-            
-            // Seri (Streak) Hesaplama Mantığı
+            // Seri hesaplama
             const today = new Date().toDateString();
             if (appData.stats.lastStudyDate !== today) {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
-                if (appData.stats.lastStudyDate === yesterday.toDateString()) {
-                    appData.stats.streak++;
-                } else {
-                    appData.stats.streak = 1; // Yeni veya kopan seri
-                }
+                appData.stats.streak = appData.stats.lastStudyDate === yesterday.toDateString()
+                    ? (appData.stats.streak || 0) + 1 : 1;
                 appData.stats.lastStudyDate = today;
                 updateGlobalStreak();
             }
 
-            appData.stats.totalRepetitions++;
-            if(rating === "again") {
-                appData.stats.totalErrors++;
+            appData.stats.totalRepetitions = (appData.stats.totalRepetitions || 0) + 1;
+            if (rating === "again") {
+                appData.stats.totalErrors = (appData.stats.totalErrors || 0) + 1;
                 currentCard.wrong = (currentCard.wrong || 0) + 1;
             }
 
-            // Günlük tekrar sayacı
+            // Günlük tekrar sayacı + haftalık veri
             const todayStr = new Date().toDateString();
             if (appData.stats.todayDate !== todayStr) {
                 appData.stats.todayDate = todayStr;
@@ -1254,17 +1481,20 @@ function save() {
             }
             appData.stats.todayReps = (appData.stats.todayReps || 0) + 1;
 
+            // Haftalık veri: {dateStr: count}
+            if (!appData.stats.weeklyData) appData.stats.weeklyData = {};
+            appData.stats.weeklyData[todayStr] = (appData.stats.weeklyData[todayStr] || 0) + 1;
+
             // Günlük hedefe ulaşıldıysa kutla
             const goal = appData.stats.dailyGoal || 10;
             if (appData.stats.todayReps === goal) {
-                showToast(`🎉 Günlük hedefinize ulaştınız! ${goal} kart tamamlandı!`, "var(--green)");
+                showToast(`🎉 Günlük hedefinize ulaştınız! ${goal} kart!`, "var(--green)");
                 triggerConfetti();
             }
-            
-            currentCard.repetitions = (currentCard.repetitions || 0) + 1;
-            
+
             save();
-            showToast(`Kart Derecelendirildi: ${rating.toUpperCase()}`, "var(--blue)");
+            showToast(`${rating === "again" ? "↩ Tekrar" : rating === "hard" ? "😅 Zor" : rating === "good" ? "✓ İyi" : "⚡ Kolay"}`, 
+                      rating === "again" ? "var(--red)" : rating === "hard" ? "var(--orange)" : rating === "good" ? "var(--green)" : "var(--blue)");
             selectDeck(activeDeckId);
         }
 
@@ -1970,12 +2200,17 @@ function save() {
         function addNewDeck() {
             let val = document.getElementById("newDeckNameInput").value.trim();
             if(!val) return;
+            const selectedColor = document.querySelector(".deck-color-opt[data-selected]")?.dataset.color || "#F97316";
+            const emoji = document.getElementById("newDeckEmoji")?.value.trim() || "📁";
             let id = "d_" + Date.now();
-            appData.decks.push({ id: id, name: val });
+            appData.decks.push({ id, name: val, color: selectedColor, emoji });
             save();
             renderSidebar();
             closeModal("addDeckModal");
             document.getElementById("newDeckNameInput").value = "";
+            document.getElementById("newDeckEmoji").value = "";
+            document.querySelectorAll(".deck-color-opt").forEach(el => el.removeAttribute("data-selected"));
+            document.querySelectorAll(".deck-color-opt")[0]?.setAttribute("style", document.querySelectorAll(".deck-color-opt")[0].getAttribute("style").replace(/border:[^;]+;/, "") + " border:2px solid white;");
             showToast("Yeni deste başarıyla eklendi.", "var(--green)");
         }
 
@@ -2055,6 +2290,111 @@ function save() {
             document.getElementById("streakCount").textContent = appData.stats.streak || 0;
         }
 
+        function renderWeekChart() {
+            const container = document.getElementById("weekChart");
+            if (!container) return;
+            container.innerHTML = "";
+            const days = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+            const today = new Date();
+            const todayStr = today.toDateString();
+            const weeklyData = appData.stats.weeklyData || {};
+            const entries = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                entries.push({ label: days[d.getDay() === 0 ? 6 : d.getDay() - 1], dateStr: d.toDateString(), count: weeklyData[d.toDateString()] || 0 });
+            }
+            const max = Math.max(...entries.map(e => e.count), 1);
+            entries.forEach(e => {
+                const wrap = document.createElement("div");
+                wrap.className = "week-bar-wrap";
+                const bar = document.createElement("div");
+                bar.className = "week-bar" + (e.dateStr === todayStr ? " today" : "");
+                bar.style.height = `${Math.max((e.count / max) * 60, 4)}px`;
+                const val = document.createElement("div");
+                val.className = "week-val";
+                val.textContent = e.count > 0 ? e.count : "";
+                const lbl = document.createElement("div");
+                lbl.className = "week-label";
+                lbl.textContent = e.label;
+                wrap.appendChild(val);
+                wrap.appendChild(bar);
+                wrap.appendChild(lbl);
+                container.appendChild(wrap);
+            });
+        }
+
+        // AI KART ÜRETİCİ
+        let aiGeneratedCards = [];
+
+        function populateAiGenDeckTarget() {
+            const sel = document.getElementById("aiGenDeckTarget");
+            if (!sel) return;
+            sel.innerHTML = "";
+            appData.decks.forEach(d => {
+                const opt = document.createElement("option");
+                opt.value = d.id; opt.textContent = d.name;
+                if (d.id === activeDeckId) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        async function handleAiCardGeneration() {
+            const topic = document.getElementById("aiGenTopic").value.trim() || "genel kelimeler";
+            const level = document.getElementById("aiGenLevel").value;
+            const count = Math.min(parseInt(document.getElementById("aiGenCount").value) || 10, 30);
+            const btn = document.getElementById("aiGenCardsBtn");
+            const preview = document.getElementById("aiGenPreview");
+            const saveBtn = document.getElementById("aiGenSaveBtn");
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="ai-spinner"></span> Üretiliyor...`;
+            preview.style.display = "none";
+            saveBtn.style.display = "none";
+            aiGeneratedCards = [];
+
+            const prompt = `"${topic}" konusunda ${level} seviyesinde ${count} adet Hollandaca-Türkçe kelime kartı üret. Her kartta kelime, anlam ve kısa bir Hollandaca örnek cümle olsun. SADECE şu JSON formatında döndür, başka hiçbir şey yazma: {"cards":[{"word":"Hollandaca kelime","meaning":"Türkçe anlam","sentence":"Hollandaca örnek cümle"}]}`;
+
+            const res = await runGroqAi(prompt);
+            btn.disabled = false;
+            btn.textContent = "✨ Kartları Üret";
+
+            try {
+                const clean = res.replace(/```json|```/g, "").trim();
+                const data = JSON.parse(clean);
+                aiGeneratedCards = data.cards || [];
+                preview.style.display = "flex";
+                preview.innerHTML = "";
+                aiGeneratedCards.forEach((c, i) => {
+                    const div = document.createElement("div");
+                    div.style.cssText = "background:var(--surface2); border-radius:10px; padding:10px 12px; border-left:3px solid var(--orange); font-size:13px;";
+                    div.innerHTML = `<strong>${c.word}</strong> — ${c.meaning}<br><small style="color:var(--subtle);">${c.sentence || ""}</small>`;
+                    preview.appendChild(div);
+                });
+                saveBtn.style.display = aiGeneratedCards.length > 0 ? "block" : "none";
+                showToast(`${aiGeneratedCards.length} kart üretildi!`, "var(--green)");
+            } catch(e) {
+                showToast("Kart üretimi başarısız, tekrar deneyin.", "var(--red)");
+            }
+        }
+
+        function saveAiGeneratedCards() {
+            const deckId = document.getElementById("aiGenDeckTarget")?.value || activeDeckId;
+            aiGeneratedCards.forEach(c => {
+                appData.cards.push({
+                    id: "c_" + Date.now() + "_" + Math.random().toString(36).slice(2,5),
+                    deckId, word: c.word, meaning: c.meaning, sentence: c.sentence || "",
+                    repetitions: 0, wrong: 0
+                });
+            });
+            save();
+            renderSidebar();
+            selectDeck(activeDeckId);
+            closeModal("aiCardGenModal");
+            showToast(`${aiGeneratedCards.length} kart "${appData.decks.find(d=>d.id===deckId)?.name}" destesine eklendi!`, "var(--green)");
+            aiGeneratedCards = [];
+        }
+
         function saveDailyGoal() {
             const val = parseInt(document.getElementById("dailyGoalInput").value) || 10;
             appData.stats.dailyGoal = val;
@@ -2093,6 +2433,8 @@ function save() {
             if (goalBar) goalBar.style.width = `${goalPercent}%`;
             if (goalText) goalText.textContent = `${todayReps} / ${goal}`;
             if (goalInput) goalInput.value = goal;
+
+            renderWeekChart();
         }
 
         // SYSTEM BACKUP MANAGER
