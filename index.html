@@ -994,7 +994,12 @@ function save() {
             document.getElementById("btnEasy").onclick = () => handleAnswer("easy");
             document.getElementById("undoBtn").onclick = triggerUndo;
             
+            let suppressNextCardClick = false;
             document.getElementById("mainCard").onclick = (e) => {
+                if (suppressNextCardClick) {
+                    suppressNextCardClick = false;
+                    return;
+                }
                 if(!e.target.closest('button') && !e.target.closest('input')) {
                     flipCard();
                 }
@@ -1036,6 +1041,7 @@ function save() {
 
                 function onTouchEnd(e) {
                     if (!startX) return;
+                    if (e.changedTouches) suppressNextCardClick = true;
                     const touch = e.changedTouches ? e.changedTouches[0] : e;
                     const dx = touch.clientX - startX;
                     const dy = touch.clientY - startY;
@@ -2574,24 +2580,132 @@ function save() {
             reader.readAsText(file);
         }
 
+        function makeSafeDeckId(name) {
+            const base = String(name || "deste")
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/ı/g, "i")
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "")
+                .slice(0, 36) || "deste";
+            let id = base;
+            let index = 2;
+            while (appData.decks.some(d => d.id === id)) {
+                id = `${base}-${index++}`;
+            }
+            return id;
+        }
+
+        function normalizeImportedCard(rawCard, fallbackDeckId) {
+            if (!rawCard || typeof rawCard !== "object") return null;
+            const word = rawCard.word || rawCard.front || rawCard.nl || rawCard.dutch || rawCard.term || rawCard.question;
+            const meaning = rawCard.meaning || rawCard.back || rawCard.tr || rawCard.turkish || rawCard.translation || rawCard.answer;
+            if (!word || !meaning) return null;
+            return {
+                ...rawCard,
+                id: rawCard.id || "c_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
+                deckId: rawCard.deckId || fallbackDeckId,
+                word: String(word).trim(),
+                meaning: String(meaning).trim(),
+                sentence: rawCard.sentence || rawCard.example || "",
+                repetitions: Number(rawCard.repetitions || 0),
+                wrong: Number(rawCard.wrong || 0),
+                modeStats: rawCard.modeStats || {}
+            };
+        }
+
+        function addImportedDeck(rawDeck, fallbackName) {
+            const deckName = String(rawDeck?.name || rawDeck?.title || rawDeck?.deckName || fallbackName || "İçe Aktarılan Deste").trim();
+            const preferredId = rawDeck?.id ? String(rawDeck.id).trim() : "";
+            let deckId = preferredId && !appData.decks.some(d => d.id === preferredId) ? preferredId : makeSafeDeckId(deckName);
+            const deck = {
+                id: deckId,
+                name: deckName,
+                color: rawDeck?.color || "#F97316",
+                emoji: rawDeck?.emoji || "📁"
+            };
+            appData.decks.push(deck);
+            return deck.id;
+        }
+
+        function importCardsToDeck(cards, fallbackDeckId) {
+            let added = 0;
+            cards.forEach(rawCard => {
+                const normalized = normalizeImportedCard(rawCard, fallbackDeckId);
+                if (!normalized) return;
+                if (appData.cards.some(c => c.id === normalized.id)) {
+                    normalized.id = "c_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+                }
+                appData.cards.push(normalized);
+                added++;
+            });
+            return added;
+        }
+
         function importSystemData(e) {
             let file = e.target.files[0];
             if (!file) return;
             let reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    let parsed = JSON.parse(evt.target.result);
-                    // Temel yapı kontrolü
-                    if(parsed.cards && Array.isArray(parsed.decks)) {
-                        // Mevcut varsayılan yapıyı korumak için yüklenen veriyi güvenli bir şekilde birleştir
-                        appData = Object.assign({}, appData, parsed);
-                        
+                    let parsed = JSON.parse(String(evt.target.result).replace(/^\uFEFF/, ""));
+                    let addedDecks = 0;
+                    let addedCards = 0;
+                    let firstImportedDeckId = null;
+
+                    if (Array.isArray(parsed)) {
+                        const looksLikeCards = parsed.some(item => item && (item.word || item.front || item.nl || item.term || item.question));
+                        if (looksLikeCards) {
+                            const targetDeckId = activeDeckId !== "all" && activeDeckId !== "multi" ? activeDeckId : appData.decks[0]?.id || addImportedDeck({ name: "İçe Aktarılan Kartlar" });
+                            firstImportedDeckId = targetDeckId;
+                            addedCards += importCardsToDeck(parsed, targetDeckId);
+                        } else {
+                            parsed.forEach((deck, index) => {
+                                const deckId = addImportedDeck(deck, `İçe Aktarılan Deste ${index + 1}`);
+                                if (!firstImportedDeckId) firstImportedDeckId = deckId;
+                                addedDecks++;
+                                if (Array.isArray(deck.cards)) addedCards += importCardsToDeck(deck.cards, deckId);
+                            });
+                        }
+                    } else if (parsed && typeof parsed === "object") {
+                        const deckSources = Array.isArray(parsed.decks) ? parsed.decks : (parsed.deck ? [parsed.deck] : []);
+                        deckSources.forEach((deck, index) => {
+                            const deckId = addImportedDeck(deck, `İçe Aktarılan Deste ${index + 1}`);
+                            if (!firstImportedDeckId) firstImportedDeckId = deckId;
+                            addedDecks++;
+                            if (Array.isArray(deck.cards)) addedCards += importCardsToDeck(deck.cards, deckId);
+                        });
+
+                        if (Array.isArray(parsed.cards)) {
+                            const shouldCreateDeck = !firstImportedDeckId && (parsed.name || parsed.title || parsed.deckName || parsed.color || parsed.emoji);
+                            const targetDeckId = firstImportedDeckId || (shouldCreateDeck ? addImportedDeck(parsed, "İçe Aktarılan Deste") : (activeDeckId !== "all" && activeDeckId !== "multi" ? activeDeckId : appData.decks[0]?.id || addImportedDeck({ name: "İçe Aktarılan Kartlar" })));
+                            if (shouldCreateDeck) addedDecks++;
+                            if (!firstImportedDeckId) firstImportedDeckId = targetDeckId;
+                            addedCards += importCardsToDeck(parsed.cards, targetDeckId);
+                        } else if (Array.isArray(parsed.items)) {
+                            const deckId = firstImportedDeckId || addImportedDeck(parsed, parsed.name || "İçe Aktarılan Deste");
+                            if (!firstImportedDeckId) { firstImportedDeckId = deckId; addedDecks++; }
+                            addedCards += importCardsToDeck(parsed.items, deckId);
+                        }
+
+                        if (!addedDecks && !addedCards && (parsed.word || parsed.front || parsed.nl || parsed.term || parsed.question)) {
+                            const targetDeckId = activeDeckId !== "all" && activeDeckId !== "multi" ? activeDeckId : appData.decks[0]?.id || addImportedDeck({ name: "İçe Aktarılan Kartlar" });
+                            firstImportedDeckId = targetDeckId;
+                            addedCards += importCardsToDeck([parsed], targetDeckId);
+                        }
+                    }
+
+                    if (addedDecks || addedCards) {
                         save();
-                        location.reload();
+                        renderSidebar();
+                        selectDeck(firstImportedDeckId || activeDeckId);
+                        closeModal("settingsModal");
+                        showToast(`${addedDecks} deste, ${addedCards} kart içe aktarıldı.`, "var(--green)");
                     } else {
-                        showToast("Geçersiz JSON formatı! 'cards' ve 'decks' alanları zorunludur.", "var(--red)");
+                        showToast("JSON içinde içe aktarılacak deste veya kart bulunamadı.", "var(--red)");
                     }
                 } catch(err) { showToast("Dosya okuma hatası veya geçersiz JSON!", "var(--red)"); }
+                e.target.value = "";
             };
             reader.readAsText(file);
         }
