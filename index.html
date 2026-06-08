@@ -1,810 +1,4 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <meta name="theme-color" content="#0A0A0F">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="LinguaPrime">
-    <meta name="description" content="Hollandaca öğrenmek için AI destekli profesyonel flashcard uygulaması">
-    
-    <!-- PWA MANIFEST (Dahili Base64 Yerine İndirilebilir Uygulama Standartlarına Uygunlaştırıldı) -->
-    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22LinguaPrime%20Ultimate%22%2C%22short_name%22%3A%22LinguaPrime%22%2C%22description%22%3A%22AI%20destekli%20Hollandaca%20%C3%B6%C4%9Frenme%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230A0A0F%22%2C%22theme_color%22%3A%22%230A0A0F%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20192%20192'%3E%3Crect%20width%3D'192'%20height%3D'192'%20rx%3D'40'%20fill%3D'%23F97316'%2F%3E%3Ctext%20x%3D'50%25'%20y%3D'55%25'%20font-size%3D'120'%20text-anchor%3D'middle'%20dominant-baseline%3D'middle'%3E%F0%9F%87%B3%F0%9F%87%B1%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
-    
-    <title>LinguaPrime Ultimate</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        :root {
-            --bg: #08080C; --surface: rgba(24, 24, 30, 0.7); --surface2: rgba(42, 42, 54, 0.6); --surface3: rgba(60, 60, 75, 0.5);
-            --border: rgba(255,255,255,0.1); --text: #F8FAFC; --muted: #94A3B8; --subtle: #CBD5E1;
-            --orange: #F97316; --green: #22C55E; --red: #EF4444; --blue: #3B82F6; --purple: #8B5CF6;
-            --card-bg: rgba(22, 22, 28, 0.85); --radius: 28px; --font: 'DM Sans', system-ui, sans-serif;
-            --glass: blur(16px) saturate(180%);
-        }
-        
-        body.light {
-            --bg: #F8FAFC; --surface: rgba(255, 255, 255, 0.75); --surface2: rgba(241, 245, 249, 0.8); --surface3: rgba(226, 232, 240, 0.8);
-            --border: rgba(0,0,0,0.06); --text: #0F172A; --muted: #64748B; --subtle: #475569;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --glass: blur(12px) saturate(150%);
-        }
-        
-        html, body { 
-            height: 100%;
-            height: 100dvh; 
-            margin: 0; padding: 0; 
-            overflow: hidden; 
-            overscroll-behavior: none;
-            font-family: var(--font); background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s;
-        }
-        @supports (-webkit-touch-callout: none) { html, body { height: -webkit-fill-available; } }
-        /* iOS Safari tam ekran desteği */
-        button, input, select, textarea { font-family: var(--font); }
-        
-        /* TOP BAR */
-        .menu-btn { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 16px; z-index: 1100; width: 48px; height: 48px; border-radius: 16px; background: var(--surface); backdrop-filter: var(--glass); border: 1px solid var(--border); color: var(--text); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .menu-btn:active { transform: scale(0.93); }
-        .quick-add-btn { position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 16px; z-index: 1100; width: 48px; height: 48px; border-radius: 16px; background: var(--orange); border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 8px 24px rgba(249,115,22,0.25); }
-        .quick-add-btn:active { transform: scale(0.93); }
-        .streak-badge { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 76px; z-index: 1100; height: 48px; padding: 0 16px; border-radius: 16px; background: var(--surface); backdrop-filter: var(--glass); border: 1px solid var(--border); color: #FFA500; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
-        .streak-badge:active { transform: scale(0.96); }
-        
-        /* SIDEBAR */
-        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 310px; height: 100vh; height: 100dvh; background: var(--card-bg); backdrop-filter: var(--glass); border-right: 1px solid var(--border); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1300; display: flex; flex-direction: column; padding-top: calc(16px + env(safe-area-inset-top)); overflow: hidden; }
-        @supports (-webkit-touch-callout: none) {
-            .sidebar { height: -webkit-fill-available; }
-        }
-        .sidebar.open { transform: translateX(0); }
-        .sidebar-header { padding: 14px 16px; font-size: 17px; font-weight: 800; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; letter-spacing: -0.3px; }
-        .sidebar-logo { background: linear-gradient(135deg, var(--orange), #FB923C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .toggle-deck-btn { background: var(--surface2); border: none; color: var(--text); padding: 5px 11px; border-radius: 20px; font-size: 11px; cursor: pointer; min-height: 32px; font-weight: 600; }
-        .deck-list-container { flex: 0 0 auto; max-height: 30vh; max-height: 30dvh; overflow-y: auto; min-height: 60px; border-bottom: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
-        .sidebar-item { padding: 11px 16px; cursor: pointer; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; transition: background 0.15s; color: var(--text); text-decoration: none; }
-        .sidebar-item:hover { background: var(--surface2); }
-        .sidebar-item.active { background: var(--orange); color: #0A0A0F; font-weight: 700; }
-        .sidebar-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
-        .edit-deck-btn, .delete-deck-btn { background: none; border: none; color: inherit; cursor: pointer; font-size: 14px; padding: 6px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-        .delete-deck-btn:hover { background: var(--red); color: white; }
-        .sidebar-footer { flex: 1; overflow-y: auto; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1200; display: none; backdrop-filter: blur(3px); }
-        .overlay.show { display: block; }
-        body.sidebar-open { overflow: hidden; touch-action: none; }
 
-        /* sidebar iOS fix handled separately */
-        
-        /* MAIN AREA */
-        .main { height: 100%; height: -webkit-fill-available; display: flex; flex-direction: column; overflow: auto; padding-top: calc(70px + env(safe-area-inset-top)); }
-        .card-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 20px 4px; position: relative; min-height: 0; }
-        .card-container { width: 100%; max-width: 560px; -webkit-perspective: 1400px; perspective: 1400px; }
-        .card { width: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; border-radius: var(--radius); }
-        .card.flipped { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
-        .card-face { -webkit-backface-visibility: hidden; backface-visibility: hidden; background: var(--card-bg); backdrop-filter: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 32px; min-height: clamp(250px, 45vh, 420px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        @media (max-width: 680px) {
-            .card-area { justify-content: flex-start; padding: 24px 16px calc(130px + env(safe-area-inset-bottom)); }
-            .card-face { min-height: clamp(220px, 38vh, 360px); }
-        }
-        body.light .card-face { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
-        .card-front { -webkit-transform: rotateY(0deg) translateZ(1px); transform: rotateY(0deg) translateZ(1px); }
-        .card-back { -webkit-transform: rotateY(180deg) translateZ(1px); transform: rotateY(180deg) translateZ(1px); position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; }
-        .word { font-size: clamp(28px, 6vw, 40px); font-weight: 800; margin: 16px 0; line-height: 1.2; letter-spacing: -0.02em; }
-        .meaning { font-size: clamp(20px, 4vw, 24px); font-weight: 600; color: var(--orange); margin: 10px 0; }
-        .sentence { font-size: 14px; color: var(--subtle); font-style: italic; margin-top: 10px; max-width: 90%; }
-        .badge { background: var(--surface2); padding: 4px 12px; border-radius: 24px; font-size: 11px; color: var(--subtle); font-weight: 600; text-transform: uppercase; }
-        .swipe-icon { position: absolute; top: 20px; font-size: 32px; font-weight: bold; opacity: 0; transition: opacity 0.1s; pointer-events: none; z-index: 15; }
-        .swipe-icon.right { right: 18px; color: var(--green); }
-        .swipe-icon.left { left: 18px; color: var(--red); }
-        
-        /* ACTION BAR */
-        .action-bar { display: flex; gap: 10px; padding: 16px 20px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); max-width: 600px; margin: 0 auto; width: 100%; flex-shrink: 0; }
-        .action-btn { flex: 1; padding: 14px 6px; border-radius: 30px; background: var(--surface); border: none; color: var(--text); font-weight: 700; cursor: pointer; transition: transform 0.12s, background 0.15s; font-size: 12px; }
-        .action-btn:active { transform: scale(0.94); background: var(--surface3); }
-        .action-btn.again { border-left: 4px solid var(--red); }
-        .action-btn.hard { border-left: 4px solid var(--orange); }
-        .action-btn.good { border-left: 4px solid var(--green); }
-        .action-btn.easy { border-left: 4px solid var(--blue); }
-        .action-btn.undo-btn { border-left: 4px solid var(--purple); flex: 0.55; }
-        .action-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
-
-        /* ÇIFT YÖN & YAZARAK ÖĞRENME */
-        .direction-toggle { display: flex; align-items: center; gap: 6px; justify-content: center; padding: 4px 10px 0; flex-shrink: 0; }
-        .direction-btn { padding: 5px 12px; border-radius: 16px; background: var(--surface2); border: 1px solid var(--border); color: var(--subtle); font-size: 11px; cursor: pointer; font-weight: 600; transition: all 0.15s; }
-        .direction-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
-        .type-input-area { width: 100%; margin-top: 12px; display: flex; gap: 8px; flex-direction: column; align-items: center; }
-        .type-input { width: 100%; max-width: 340px; background: var(--surface2); border: 2px solid var(--border); border-radius: 14px; padding: 12px 16px; color: var(--text); font-size: 16px; text-align: center; transition: border-color 0.2s; }
-        .type-input:focus { outline: none; border-color: var(--orange); }
-        .type-input.correct { border-color: var(--green); background: rgba(34,197,94,0.08); }
-        .type-input.wrong { border-color: var(--red); background: rgba(239,68,68,0.08); }
-        .type-hint { font-size: 12px; color: var(--subtle); margin-top: 4px; }
-
-        /* HAFTALIK GRAFİK */
-        .week-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 8px 4px 0; }
-        .week-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
-        .week-bar { width: 100%; background: var(--orange); border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.4s ease; }
-        .week-bar.today { background: var(--green); }
-        .week-label { font-size: 9px; color: var(--subtle); font-weight: 700; }
-        .week-val { font-size: 9px; color: var(--subtle); }
-
-        /* DESTE RENK ETİKETİ */
-        .deck-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; display: inline-block; margin-right: 4px; }
-
-        /* KLAVYE KİSAYOL BADGE */
-        .kbd-info-box { text-align: center; padding: 6px 14px; flex-shrink: 0; background: var(--surface); backdrop-filter: var(--glass); margin: 0 auto 10px; border-radius: 12px; border: 1px solid var(--border); display: none; }
-        @media (min-width: 1024px) { .kbd-info-box { display: block; } } /* Sadece Mac/Bilgisayar ekranlarında göster */
-        .kbd-info-box span { font-size: 11px; color: var(--subtle); font-weight: 600; display: flex; gap: 12px; justify-content: center; align-items: center; }
-        .kbd { 
-            display: inline-block; background: var(--surface3); border: 1px solid var(--border); 
-            border-radius: 5px; padding: 2px 6px; font-size: 10px; font-family: 'Space Mono', monospace; 
-            color: var(--orange); box-shadow: 0 2px 0 var(--border); margin-right: 4px;
-        }
-        
-        /* MODE SELECTOR */
-        .mode-selector { display: flex; gap: 6px; justify-content: center; padding: 6px 10px 0; flex-wrap: wrap; flex-shrink: 0; }
-        .mode-btn { padding: 8px 14px; border-radius: 20px; background: var(--surface2); border: none; color: var(--text); font-size: 11px; cursor: pointer; transition: background 0.15s, transform 0.1s; font-weight: 600; }
-        .mode-btn:active { transform: scale(0.94); }
-        .mode-btn.active { background: var(--orange); color: white; }
-        
-        /* PROGRESS BAR */
-        .progress-bar-container { width: 100%; max-width: 560px; margin: 0 auto; padding: 6px 16px 0; flex-shrink: 0; }
-        .progress-bar-bg { background: var(--surface2); border-radius: 8px; height: 6px; margin-bottom: 4px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--green)); border-radius: 8px; transition: width 0.3s ease; width: 0%; }
-        .progress-text { text-align: center; color: var(--subtle); font-size: 11px; font-weight: 600; }
-        
-        /* MODALS */
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--surface); border-radius: var(--radius); padding: 24px; width: 94%; max-width: 580px; z-index: 1400; display: none; flex-direction: column; gap: 14px; border: 1px solid var(--border); max-height: 90vh; max-height: 90dvh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.5); -webkit-overflow-scrolling: touch; transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .modal.open { display: flex; }
-        @media (min-width: 768px) { .modal { max-width: 880px; padding: 32px; } }
-        
-        /* ODAK MODU (FULLSCREEN) STİLLERİ */
-        .modal.fullscreen { width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; top: 0; left: 0; transform: none; border-radius: 0; z-index: 2000; padding-top: calc(20px + env(safe-area-inset-top)); }
-        .focus-toggle-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; padding: 4px; transition: color 0.2s; display: flex; align-items: center; justify-content: center; }
-        .focus-toggle-btn:hover { color: var(--orange); }
-
-        .modal h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
-        .modal input, .modal select, .modal textarea { background: var(--surface2); border: 1px solid var(--surface3); padding: 12px 14px; border-radius: 14px; color: var(--text); font-size: 14px; width: 100%; transition: border-color 0.2s; }
-        .modal input:focus, .modal select:focus, .modal textarea:focus { outline: none; border-color: var(--orange); }
-        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
-        
-        /* BUTTON VARIATIONS */
-        .btn-primary { background: var(--orange); color: #0A0A0F; border: none; padding: 11px 22px; border-radius: 22px; cursor: pointer; font-weight: 700; font-size: 14px; transition: transform 0.12s; }
-        .btn-primary:active { transform: scale(0.95); }
-        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 11px 18px; border-radius: 22px; cursor: pointer; font-size: 14px; }
-        .btn-danger { background: var(--red); color: white; border: none; padding: 11px 18px; border-radius: 22px; cursor: pointer; font-size: 14px; font-weight: 600; }
-        
-        /* DATA TABLES */
-        .table-container { overflow-y: auto; max-height: 40vh; border-radius: 12px; border: 1px solid var(--border); margin-top: 6px; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-        th { padding: 12px 10px; background: var(--surface2); position: sticky; top: 0; z-index: 1; font-size: 11px; color: var(--subtle); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--surface3); }
-        td { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text); }
-        
-        /* CORE REUSABLE STYLES */
-        .search-input { background: var(--surface2); border: 1px solid var(--surface3); padding: 10px 14px; border-radius: 12px; color: var(--text); font-size: 13px; }
-        .tts-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 12px; color: var(--text); cursor: pointer; font-size: 12px; }
-        .tts-btn:hover { background: var(--surface3); }
-        
-        /* AI MODULE REUSABLES */
-        .ai-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 14px; background: linear-gradient(135deg, #7C3AED, #4F46E5); border: none; color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: transform 0.12s; }
-        .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .ai-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* REPEATING MODAL UI CONSTRUCTS */
-        .chat-area-box { background: var(--surface2); border-radius: 16px; padding: 12px; height: 50vh; min-height: 350px; max-height: 650px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
-        
-        /* COPIED CSS OVERLAYS FROM DATA CORPUS */
-        .chat-msg { max-width: 78%; padding: 9px 13px; border-radius: 18px; font-size: 13px; line-height: 1.55; }
-        .chat-msg.bot { background: var(--surface3); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
-        .chat-msg.user { background: var(--orange); color: #0A0A0F; align-self: flex-end; border-bottom-right-radius: 4px; }
-        
-        .wa-msg { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-break: break-word; }
-        .wa-msg.them { background: #1e2d1e; color: #e9fde9; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .wa-msg.me { background: #005c4b; color: #e9fde9; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .wa-time { font-size: 10px; opacity: 0.6; text-align: right; margin-top: 2px; }
-        
-        .rpg-narrator { background: rgba(139,92,246,0.1); border-left: 3px solid var(--purple); padding: 8px 12px; border-radius: 0 10px 10px 0; font-style: italic; font-size: 12px; color: var(--subtle); margin: 4px 0; }
-        .rpg-npc { background: var(--surface3); border-radius: 12px 12px 12px 2px; padding: 10px; align-self: flex-start; font-size: 13px; color: var(--text); }
-        .rpg-user { background: var(--orange); color: #0A0A0F; border-radius: 12px 12px 2px 12px; padding: 10px 13px; font-size: 13px; align-self: flex-end; }
-        
-        /* INTERACTIVE MODES GRAPHICS */
-        .verb-drill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; width: 100%; }
-        .verb-drill-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--surface2); border-radius: 12px; }
-        .verb-person { font-size: 12px; color: var(--subtle); font-weight: 700; width: 36px; flex-shrink: 0; }
-        .verb-input { flex: 1; background: transparent; border: none; border-bottom: 2px solid var(--surface3); color: var(--text); font-size: 14px; padding: 3px 4px; outline: none; }
-        .verb-input.correct { border-bottom-color: var(--green); color: var(--green); }
-        .verb-input.wrong { border-bottom-color: var(--red); color: var(--red); }
-        
-        .woordvolgorde-zone { min-height: 52px; background: var(--surface2); border-radius: 18px; padding: 10px; margin-top: 10px; border: 2px dashed var(--border); display: flex; flex-wrap: wrap; gap: 7px; align-items: center; justify-content: center; width: 100%; }
-        .wv-word { background: var(--orange); color: white; padding: 7px 13px; border-radius: 18px; cursor: pointer; font-size: 13px; font-weight: 700; transition: transform 0.1s; }
-        .wv-word.placed { background: var(--green); }
-        
-        .grammar-options { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
-        .grammar-opt-btn { padding: 9px 18px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 600; }
-        
-        /* TOAST & SYSTEM */
-        #toast { position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%) translateY(-200px); padding: 12px 24px; border-radius: 20px; font-weight: 700; z-index: 3000; transition: transform 0.3s cubic-bezier(.175, .885, .32, 1.275); color: white; box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-size: 13px; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
-        #toast.show { transform: translateX(-50%) translateY(0); }
-        .confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
-        
-        /* STATS GRID */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 8px; }
-        .stat-card { background: var(--surface2); border-radius: 15px; padding: 13px; text-align: center; border: 1px solid var(--border); }
-        .stat-number { font-size: 24px; font-weight: 800; color: var(--orange); }
-        .stat-label { font-size: 11px; color: var(--subtle); margin-top: 2px; font-weight: 600; }
-        .stat-card.green .stat-number { color: var(--green); }
-        .stat-card.blue .stat-number { color: var(--blue); }
-        .stat-card.red .stat-number { color: var(--red); }
-        .stat-card.purple .stat-number { color: var(--purple); }
-        
-        /* CORRECTION & WEAKNESS BUILDERS */
-        .correction-box, .weakness-item { background: var(--surface2); border-radius: 14px; padding: 14px; margin-top: 8px; border: 1px solid var(--border); }
-        .weakness-item { border-left: 4px solid var(--red); }
-        .story-highlight { background: rgba(249,115,22, 0.2); color: var(--orange); border-radius: 4px; padding: 1px 4px; font-weight: 700; }
-        
-        .achievements-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-        .achievement { background: var(--surface2); border-radius: 13px; padding: 11px 7px; text-align: center; border: 2px solid transparent; opacity: 0.5; transition: opacity 0.3s; }
-        .achievement.earned { border-color: var(--orange); opacity: 1; }
-        .achievement-icon { font-size: 26px; }
-        .achievement-name { font-size: 10px; color: var(--subtle); margin-top: 3px; }
-        .achievement.earned .achievement-name { color: var(--orange); font-weight: 700; }
-        
-        /* GROQ KEY GATE SCREEN */
-        .groq-setup { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; text-align: center; }
-        .groq-setup-icon { font-size: 64px; margin-bottom: 16px; }
-        .groq-setup-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-        .groq-setup-desc { font-size: 14px; color: var(--subtle); line-height: 1.65; margin-bottom: 20px; max-width: 360px; }
-        
-        /* VOICE BADGE & PULSER */
-        .voice-badge { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 16px; width: 50px; height: 50px; border-radius: 50%; background: var(--purple); border: none; color: white; font-size: 22px; cursor: pointer; z-index: 1100; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(139,92,246,0.45); transition: transform 0.15s, background 0.2s; -webkit-tap-highlight-color: transparent; }
-        .voice-badge:active { transform: scale(0.93); }
-        .voice-badge.listening { background: var(--red); animation: voicePulse 1s infinite; }
-        @keyframes voicePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5) } 50% { box-shadow: 0 0 0 14px rgba(239,68,68,0) } }
-        
-        /* MEMORY CUSTOM BLOCKS */
-        .memory-card { background: var(--surface2); border-radius: 14px; padding: 14px; margin-bottom: 8px; border-left: 4px solid var(--orange); }
-        .memory-card.anchor { border-left-color: var(--blue); }
-        .memory-card.phonetic { border-left-color: var(--green); }
-        .memory-card.root { border-left-color: var(--purple); }
-        
-        /* SOCIAL MODULE LAYERS */
-        .social-layer { background: var(--surface2); border-radius: 12px; padding: 11px 14px; margin-bottom: 8px; }
-        .social-layer-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        
-        /* REGIONAL ACCENTS & DIALECTS */
-        .accent-block { background: var(--surface2); border-radius: 12px; padding: 12px; margin-bottom: 8px; border-left: 4px solid var(--purple); }
-        
-        /* AUDIO TIMELINES */
-        .podcast-transcript-line { padding: 6px 10px; border-radius: 8px; cursor: pointer; transition: background 0.2s; margin-bottom: 4px; }
-        .podcast-transcript-line:hover { background: var(--surface3); }
-        .podcast-transcript-line.active { background: rgba(249,115,22,0.15); border-left: 3px solid var(--orange); }
-
-        /* PWA INSTALL BANNER DESIGN */
-        .pwa-banner { position: fixed; bottom: calc(85px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(150px); background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 12px 18px; display: flex; align-items: center; gap: 12px; z-index: 1050; box-shadow: 0 8px 32px rgba(0,0,0,0.3); max-width: 340px; width: 92%; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .pwa-banner.show { transform: translateX(-50%) translateY(0); }
-        .pwa-banner-text { flex: 1; font-size: 13px; }
-        .pwa-banner-title { font-weight: 700; margin-bottom: 2px; }
-        .pwa-banner-sub { font-size: 11px; color: var(--subtle); }
-        .pwa-banner-btn { background: var(--orange); color: #0A0A0F; border: none; padding: 8px 14px; border-radius: 13px; font-weight: 700; font-size: 12px; cursor: pointer; white-space: nowrap; transition: transform 0.1s; }
-        .pwa-banner-btn:active { transform: scale(0.95); }
-        .pwa-banner-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px; }
-
-        /* AI Multimedia Context Styles */
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .ai-context-box { width: 100%; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
-        .ai-label { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block; }
-    </style>
-</head>
-<body>
-    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
-    <div id="toast">Sistem Bildirimi</div>
-
-    <!-- API KEY CONFIG SCREEN -->
-    <div class="groq-setup" id="groqSetupScreen" style="display: none;">
-        <div class="groq-setup-icon">🧠</div>
-        <div class="groq-setup-title">LinguaPrime AI Kurulumu</div>
-        <div class="groq-setup-desc">Uygulamanın tüm gelişmiş yapay zeka özelliklerini (Akıllı Hikayeler, Canlı Sohbetbotu, Aksan Analizi) aktifleştirmek için Groq API anahtarınızı girin. Yerel cihazınızda güvenle saklanır.</div>
-        <input type="password" class="search-input" id="groqKeyInput" placeholder="gsk_xxxxxxxxxxxx..." style="width: 100%; max-width: 360px; text-align: center; margin-bottom: 12px; font-size: 14px;">
-        <button class="btn-primary" id="saveGroqKeyBtn">Anahtarı Kaydet & Başla</button>
-        <div class="groq-setup-hint" style="font-size: 11px; margin-top: 10px; color: var(--muted);">Anahtarınız yoksa <a href="https://console.groq.com/" target="_blank" style="color:var(--orange);">groq.com</a> adresinden ücretsiz alabilirsiniz.</div>
-    </div>
-
-    <!-- PWA INSTALL BANNER POPUP -->
-    <div class="pwa-banner" id="pwaInstallBanner">
-        <div class="pwa-banner-text">
-            <div class="pwa-banner-title">LinguaPrime Uygulaması</div>
-            <div class="pwa-banner-sub">Hızlı erişim için ana ekrana ekleyin</div>
-        </div>
-        <button class="pwa-banner-btn" id="pwaInstallBtn">Yükle</button>
-        <button class="pwa-banner-close" id="pwaCloseBtn" aria-label="Kapat">×</button>
-    </div>
-
-    <!-- NAVIGATION MENU ELEMENT -->
-    <button class="menu-btn" id="menuBtn" aria-label="Menüyü Aç">☰</button>
-    <div class="streak-badge" id="streakBadge">🔥 <span id="streakCount">0</span> Gün</div>
-    <button class="quick-add-btn" id="quickAddBtn" aria-label="Hızlı Kart Ekle">＋</button>
-    <button class="voice-badge" id="voiceBadge" aria-label="Sesli Komut">🎙</button>
-    
-    <div class="overlay" id="overlay"></div>
-
-    <!-- GLOBAL APPS DRAWER SIDEBAR -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <span class="sidebar-logo">LinguaPrime v2.5</span>
-            <button class="toggle-deck-btn" id="themeToggleBtn">☀️ Işık Modu</button>
-        </div>
-        <div style="padding: 12px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
-            <input class="search-input" id="deckSearch" placeholder="🔍 Deste ara..." style="width: 100%;">
-            <button id="multiDeckStudyBtn" class="btn-primary" style="width:100%; font-size:12px; padding:8px;">🎯 Çoklu Deste Çalış</button>
-        </div>
-        <div class="deck-list-container" id="deckListSidebar"></div>
-        
-        <div class="sidebar-footer">
-            <div class="sidebar-item" id="aiCardGenBtn">🤖 AI Otomatik Kart Üretici</div>
-            <div class="sidebar-item" id="addDeckBtn">➕ Yeni Deste Oluştur</div>
-            <div class="sidebar-item" id="manageCardsBtn">📋 Kart Yönetim Paneli</div>
-            <div class="sidebar-item" id="kesfetBtn">🔍 Klasik Akıllı Flashcard</div>
-            <div class="sidebar-item" id="storyBtn">📖 AI İnteraktif Hikaye</div>
-            <div class="sidebar-item" id="correctBtn">✍ AI Akıllı Cümle Düzeltici</div>
-            <div class="sidebar-item" id="weaknessBtn">🎯 Zayıf Noktalar Analizi</div>
-            <div class="sidebar-item" id="aiDictBtn">🔤 AI Sözlük & Kart Üretici</div>
-            <div class="sidebar-item" id="chatBtn">💬 AI Canlı Mentor Sohbeti</div>
-            <div class="sidebar-item" id="podcastBtn">🎙 AI Kişisel Podcast İstasyonu</div>
-            <div class="sidebar-item" id="rpgBtn">🎭 Kültür Şoku RPG Simülatörü</div>
-            <div class="sidebar-item" id="whatsappBtn">📱 WhatsApp Günlük Dil Simülatörü</div>
-            <div class="sidebar-item" id="personalityBtn">🧬 Linguistik Kişilik Profili</div>
-            <div class="sidebar-item" id="memoryBtn">🏛 Hafıza Sarayı Mnemoni Üretici</div>
-            <div class="sidebar-item" id="socialBtn">🤝 Sosyal Zeka & Pragmatik Motoru</div>
-            <div class="sidebar-item" id="matchingBtn">🎯 AI Kelime Eşleştirme Oyunu</div>
-            <div class="sidebar-item" id="newsBtn">📰 Günlük Haber Akışı & Analizi</div>
-            <div class="sidebar-item" id="accentBtn">🗣 Bölgesel Aksan Kod Çözücü</div>
-            <div class="sidebar-item" id="lyricsBtn">🎵 Şarkı & Karaoke Linguistik Analiz</div>
-            <div class="sidebar-item" id="linguaDnaBtn">🧠 Linguistik DNA Spektrum Analizi</div>
-            <div class="sidebar-item" id="errorMuseumBtn">🏛 Kişisel Hata Müzesi Sergisi</div>
-            <div class="sidebar-item" id="statsBtn">📊 İlerleme & Analitik Dashboard</div>
-            <div class="sidebar-item" id="settingsBtn">⚙️ Gelişmiş Ayarlar & Veri Güvenliği</div>
-        </div>
-    </div>
-
-    <!-- CORE LEARNING AREA FRAMEWORK -->
-    <div class="main">
-        <div class="mode-selector">
-            <button class="mode-btn active" data-mode="classic">Flashcard</button>
-            <button class="mode-btn" data-mode="typing">Yazarak Öğren</button>
-            <button class="mode-btn" data-mode="hint">Harf İpucu</button>
-            <button class="mode-btn" data-mode="mcq">Çoktan Seçmeli</button>
-            <button class="mode-btn" data-mode="verbdrill">Fiil Çekim</button>
-            <button class="mode-btn" data-mode="grammarfill">Artikel</button>
-            <button class="mode-btn" data-mode="woordvolgorde">Cümle Düzeni</button>
-        </div>
-
-        <div class="direction-toggle">
-            <span style="font-size:11px; color:var(--subtle); font-weight:600;">Yön:</span>
-            <button class="direction-btn active" id="dirNL2TR" title="Hollandaca → Türkçe">NL → TR</button>
-            <button class="direction-btn" id="dirTR2NL" title="Türkçe → Hollandaca">TR → NL</button>
-            <button class="direction-btn" id="dirRandom" title="Rastgele yön">🔀 Rastgele</button>
-        </div>
-
-        <!-- OTURUM ÖZETİ (Eksik ID'ler buraya eklendi) -->
-        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px; font-size: 11px; font-weight: 700;">
-            <span style="color: var(--blue);">YENİ: <span id="newCount">0</span></span>
-            <span style="color: var(--red);">TEKRAR: <span id="dueCount">0</span></span>
-            <span style="color: var(--purple);">OTURUM: <span id="sessionCount">0</span></span>
-            <span style="color: var(--green);">TOPLAM: <span id="totalCount">0</span></span>
-        </div>
-
-        <div class="progress-bar-container">
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBarFill"></div></div>
-            <div class="progress-text" id="progressText">Bugün 0/0 kart tamamlandı</div>
-        </div>
-
-        <div class="card-area">
-            <div class="card-container">
-                <div class="card" id="mainCard">
-                    <!-- Front face -->
-                    <div class="card-face card-front">
-                        <span class="swipe-icon left">❌</span>
-                        <span class="swipe-icon right">✅</span>
-                        <div class="badge" id="cardDeckBadge">Genel</div>
-                        <div class="word" id="cardFrontWord">Uygulamaya Başlayın</div>
-                        <button class="tts-btn" id="frontTTSBtn">🔊 Telaffuz (NL)</button>
-                        <div id="testArea" style="width: 100%; margin-top: 15px;"></div>
-                    </div>
-                    <!-- Back face -->
-                    <div class="card-face card-back">
-                        <div class="meaning" id="cardBackMeaning">Deste Seçin veya Kart Ekleyin</div>
-                        <div class="sentence" id="cardBackSentence">Örnek cümle burada görünecektir.</div>
-                        
-                        <!-- Yapay Zeka Dinamik Bağlam Alanı -->
-                        <div id="ai-multimedia-context" class="ai-context-box">
-                            <div style="display:flex; align-items:start; gap:8px;">
-                                <span class="ai-label" style="background:var(--purple); color:white;">Dilbilgisi</span>
-                                <p id="ai-grammar" style="font-size:12px; color:var(--subtle); font-style:italic;">Kartı çevirince analiz edilir...</p>
-                            </div>
-                            <div style="background:var(--surface2); padding:8px; border-radius:10px; border-left:3px solid var(--blue);">
-                                <span class="ai-label" style="color:var(--blue); padding:0; margin-bottom:2px;">Bağlamsal Öykü (Bilingual)</span>
-                                <p id="ai-story" style="font-size:12px; color:var(--text); line-height:1.4;"></p>
-                            </div>
-                            <div style="background:rgba(245,158,11,0.1); padding:8px; border-radius:10px; border-left:3px solid var(--orange); display:flex; gap:8px; align-items:center;">
-                                <div style="font-size:18px;">🎬</div>
-                                <div>
-                                    <span class="ai-label" style="color:var(--orange); padding:0;">Dizi/Film Sahnesi Tasviri</span>
-                                    <p id="ai-media-scene" style="font-size:11px; color:var(--subtle);"></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button class="tts-btn" id="backTTSBtn">🔊 Anlamı Oku (TR)</button>
-                        <div id="cardAccuracyBadge" style="margin-top:10px; font-size:11px; color:var(--subtle); font-weight:600;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="kbd-info-box">
-            <span>
-                <label><span class="kbd">Space</span> Çevir</label>
-                <label><span class="kbd">1</span> Tekrar</label>
-                <label><span class="kbd">2</span> Zor</label>
-                <label><span class="kbd">3</span> İyi</label>
-                <label><span class="kbd">4</span> Kolay</label>
-                <label><span class="kbd">Z</span> Geri Al</label>
-            </span>
-        </div>
-
-        <div class="action-bar">
-            <button class="action-btn again" id="btnAgain">Tekrar</button>
-            <button class="action-btn hard" id="btnHard">Zor</button>
-            <button class="action-btn good" id="btnGood">İyi</button>
-            <button class="action-btn easy" id="btnEasy">Kolay</button>
-            <button class="action-btn undo-btn" id="undoBtn">↩ Geri Al</button>
-        </div>
-    </div>
-
-    <!-- MODAL POPUPS INVENTORY -->
-    <!-- 1. DECK CREATOR MODAL -->
-    <div class="modal" id="addDeckModal">
-        <h3>➕ Yeni Deste Oluştur</h3>
-        <input type="text" id="newDeckNameInput" placeholder="Deste adı girin (Örn: Seyahat Kelimeleri)...">
-        <div style="display:flex; gap:8px; align-items:center;">
-            <label style="font-size:12px; color:var(--subtle); white-space:nowrap;">Renk:</label>
-            <div id="deckColorPicker" style="display:flex; gap:6px; flex-wrap:wrap;">
-                <span class="deck-color-opt" data-color="#F97316" style="background:#F97316; width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid white;"></span>
-                <span class="deck-color-opt" data-color="#3B82F6" style="background:#3B82F6; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
-                <span class="deck-color-opt" data-color="#22C55E" style="background:#22C55E; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
-                <span class="deck-color-opt" data-color="#8B5CF6" style="background:#8B5CF6; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
-                <span class="deck-color-opt" data-color="#EF4444" style="background:#EF4444; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
-                <span class="deck-color-opt" data-color="#F59E0B" style="background:#F59E0B; width:22px; height:22px; border-radius:50%; cursor:pointer;"></span>
-            </div>
-            <label style="font-size:12px; color:var(--subtle); white-space:nowrap; margin-left:8px;">Emoji:</label>
-            <input type="text" id="newDeckEmoji" placeholder="📁" style="width:50px; text-align:center; font-size:18px;">
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('addDeckModal')">İptal</button>
-            <button class="btn-primary" id="saveNewDeckBtn">Oluştur</button>
-        </div>
-    </div>
-
-    <!-- 2. CARD MANAGEMENT PANEL -->
-    <div class="modal" id="manageCardsModal" style="max-width: 950px;">
-        <h3>📋 Kart Yönetim Paneli</h3>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" class="search-input" id="cardManageSearch" placeholder="Kartlarda veya anlamlarda ara...">
-            <select id="cardManageDeckFilter" style="width: 140px;"></select>
-        </div>
-        <button class="btn-primary" style="font-size: 12px; padding: 6px 12px;" onclick="document.getElementById('manualCardForm').style.display='flex';" id="openAddCardFormBtn">➕ Yeni Manuel Kart Ekle</button>
-        
-        <div id="manualCardForm" style="display:none; border: 1px solid var(--border); padding: 12px; border-radius: 12px; flex-direction: column; gap: 8px;">
-            <select id="mcDeckSelect" style="background: var(--surface2); border: 1px solid var(--surface3); padding: 10px 14px; border-radius: 12px; color: var(--text); font-size: 14px; width: 100%;"></select>
-            <input type="text" id="mcWord" placeholder="Hollandaca Kelime/İfade *">
-            <input type="text" id="mcMeaning" placeholder="Türkçe Anlamı *">
-            <input type="text" id="mcSentence" placeholder="Örnek Cümle (Hollandaca)">
-            <input type="text" id="mcConjugation" placeholder="Fiil ise Çekimleri (ik, je, we vb. virgülle ayırın)">
-            <div class="modal-buttons">
-                <button class="btn-secondary" onclick="document.getElementById('manualCardForm').style.display='none'">Kapat</button>
-                <button class="btn-primary" id="saveManualCardBtn">Kaydet</button>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Kelime (NL)</th><th>Anlamı (TR)</th><th>İşlem</th></tr>
-                </thead>
-                <tbody id="manageCardsTableBody"></tbody>
-            </table>
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('manageCardsModal')">Kapat</button>
-        </div>
-    </div>
-
-    <!-- 3. AI STORY ENGINE MODAL -->
-    <div class="modal" id="storyModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📖 AI İnteraktif Hikaye Üretici</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('storyModal')" title="Odak Modu">⛶</button>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <select id="storyLevel">
-                <option value="A1">A1 Seviye</option>
-                <option value="A2">A2 Seviye</option>
-                <option value="B1">B1 Seviye</option>
-                <option value="B2">B2 Seviye</option>
-            </select>
-            <select id="storyTheme">
-                <option value="Günlük Yaşam">Günlük Yaşam</option>
-                <option value="Hollanda'da İş Görüşmesi">İş Görüşmesi</option>
-                <option value="Doktor & Sağlık Sektörü">Sağlık / Doktor</option>
-                <option value="Süpermarket & Alışveriş">Alışveriş / Albert Heijn</option>
-            </select>
-        </div>
-        <div style="margin: 8px 0;">
-            <label style="font-size: 12px; font-weight: bold; margin-bottom: 4px; display: block;">Çoklu Deste Seçimi (Hikaye Kelimeleri İçin):</label>
-            <div id="storyDeckSelectorZone" style="display: flex; flex-direction: column; gap: 6px; max-height: 110px; overflow-y: auto; padding: 4px; background: var(--surface2); border-radius: 12px;"></div>
-        </div>
-        <button class="ai-btn" id="generateStoryBtn" style="width: 100%; justify-content: center;">✨ Hikaye Yaz ve Çevir</button>
-        <div class="correction-box" id="storyOutput" style="display: none; max-height: 60vh; overflow-y: auto;">
-            <div id="storyTextContainer" style="font-size:14px; line-height:1.6;"></div>
-            <hr style="margin:8px 0; opacity:0.1;">
-            <div id="storyTrContainer" style="font-size:13px; color:var(--subtle);"></div>
-        </div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('storyModal')">Kapat</button></div>
-    </div>
-
-    <!-- 4. SENTENCE CORRECTOR MODAL -->
-    <div class="modal" id="correctModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>✍ AI Akıllı Cümle Düzeltici</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('correctModal')" title="Odak Modu">⛶</button>
-        </div>
-        <textarea id="correctionInput" placeholder="Hollandaca kurduğunuz bir cümleyi yazın..." rows="3"></textarea>
-        <button class="ai-btn" id="checkCorrectionBtn" style="width: 100%; justify-content: center;">🔍 Cümle Analizi Yap</button>
-        <div class="correction-box" id="correctionResult" style="display: none;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('correctModal')">Kapat</button></div>
-    </div>
-
-    <!-- 5. WEAKNESS ANALYSIS MODAL -->
-    <div class="modal" id="weaknessModal">
-        <h3>🎯 Zayıf Noktalar Analiz Paneli</h3>
-        <div id="weaknessListContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('weaknessModal')">Kapat</button></div>
-    </div>
-
-    <!-- 6. AI DICTIONARY & COMPOSER MODAL -->
-    <div class="modal" id="aiDictModal">
-        <h3>🔤 AI Sözlük & Kart Üretici</h3>
-        <input type="text" id="aiDictQuery" placeholder="Aramak istediğiniz Hollandaca kelime...">
-        <button class="ai-btn" id="searchAiDictBtn" style="width: 100%; justify-content: center;">🤖 Akıllı Analiz ve Kart Yap</button>
-        <div class="correction-box" id="aiDictResult" style="display: none;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('aiDictModal')">Kapat</button></div>
-    </div>
-
-    <!-- 7. LIVE AI CHAT MENTOR MODAL -->
-    <div class="modal" id="chatModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>💬 AI Canlı Mentor Sohbeti</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('chatModal')" title="Odak Modu">⛶</button>
-        </div>
-        <div class="chat-area-box" id="chatMessages"></div>
-        <div style="display: flex; gap: 6px;">
-            <input type="text" id="chatInput" placeholder="Hollandaca bir şeyler yazın...">
-            <button class="btn-primary" id="sendChatBtn">Gönder</button>
-        </div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('chatModal')">Kapat</button></div>
-    </div>
-
-    <!-- 8. PODCAST STATION MODAL -->
-    <div class="modal" id="podcastModal">
-        <h3>🎙 AI Kişisel Podcast İstasyonu</h3>
-        <button class="ai-btn" id="generatePodcastBtn" style="width:100%; justify-content:center;">🎧 Günlük Dinleme Dosyası Hazırla</button>
-        <div class="correction-box" id="podcastOutput" style="display:none; text-align:center;">
-            <div style="font-size:24px; margin-bottom:10px;">📻</div>
-            <div id="podcastStatusText" style="font-weight:700;">Yayın Hazır</div>
-            <button class="btn-primary" id="playPodcastBtn" style="margin-top:8px;">▶ Dinlemeyi Başlat</button>
-        </div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('podcastModal')" id="closePodcastBtn">Kapat</button></div>
-    </div>
-
-    <!-- 9. CULTURE SHOCK RPG MODAL -->
-    <div class="modal" id="rpgModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>🎭 Kültür Şoku RPG Simülatörü</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('rpgModal')" title="Odak Modu">⛶</button>
-        </div>
-        <div id="rpgCqDisplay" style="font-size: 14px; font-weight: 700; color: var(--orange); margin-bottom: 8px;">Kültürel IQ: 50</div>
-        <div class="chat-area-box" id="rpgMessages"></div>
-        <div style="display: flex; gap: 6px; flex-direction:column;">
-            <div style="display:flex; gap:4px;" id="rpgActionOptions"></div>
-            <input type="text" id="rpgCustomInput" placeholder="Kendi aksiyonunuzu yazın...">
-            <button class="btn-primary" id="sendRpgBtn">Harekete Geç</button>
-        </div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('rpgModal')">Oyundan Çık</button></div>
-    </div>
-
-    <!-- 10. WHATSAPP SIMULATOR MODAL -->
-    <div class="modal" id="whatsappModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📱 WhatsApp Dil Simülatörü</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('whatsappModal')" title="Odak Modu">⛶</button>
-        </div>
-        <div class="chat-area-box" id="waMessages" style="background: #0b141a; border: none;"></div>
-        <div style="display: flex; gap: 6px;">
-            <input type="text" id="waInput" placeholder="Mesaj yazın...">
-            <button class="btn-primary" id="waSendBtn" style="background:#00a884; color:white;">➤</button>
-        </div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('whatsappModal')">Ayrıl</button></div>
-    </div>
-
-    <!-- 11. PERSONALITY PROFILE MODAL -->
-    <div class="modal" id="personalityModal">
-        <h3>🧬 Linguistik Kişilik Profili</h3>
-        <div id="personalityOutput" class="correction-box">Verileriniz işleniyor... Tam profil için kart çalışmaya devam edin.</div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('personalityModal')">Kapat</button></div>
-    </div>
-
-    <!-- 12. MEMORY PALACE MODAL -->
-    <div class="modal" id="memoryModal">
-        <h3>🏛 Hafıza Sarayı Mnemoni Üretici</h3>
-        <input type="text" id="memoryWordInput" placeholder="Unuttuğunuz zor bir kelime yazın...">
-        <button class="ai-btn" id="generateMemoryBtn" style="width: 100%; justify-content: center;">🧠 Hafıza Kancası Oluştur</button>
-        <div id="memoryResult" class="correction-box" style="display: none; flex-direction: column; gap: 8px;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('memoryModal')">Kapat</button></div>
-    </div>
-
-    <!-- 13. SOCIAL INTELLIGENCE ENGINE MODAL -->
-    <div class="modal" id="socialModal">
-        <h3>🤝 Sosyal Zeka & Pragmatik Motoru</h3>
-        <textarea id="socialScenarioInput" placeholder="Hollandalı bir komşunuz, iş arkadaşınız veya resmi merci ile yaşadığınız sosyal açmazı yazın..."></textarea>
-        <button class="ai-btn" id="runSocialBtn" style="width:100%; justify-content:center;">💡 Pragmatik Analiz Çalıştır</button>
-        <div id="socialResult" class="correction-box" style="display:none; flex-direction: column; gap: 8px;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('socialModal')">Kapat</button></div>
-    </div>
-
-    <!-- 14. AI WORD MATCHING GAME MODAL -->
-    <div class="modal" id="matchingModal">
-        <h3>🎯 AI Kelime Eşleştirme Oyunu</h3>
-        <div id="matchingGameZone" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;"></div>
-        <div id="matchingResult" style="text-align: center; font-weight: bold; margin-top: 8px; color: var(--orange)"></div>
-        <div class="modal-buttons">
-            <button class="btn-primary" id="checkMatchingBtn" style="display: none;">Kontrol Et</button>
-            <button class="btn-secondary" onclick="closeModal('matchingModal')">Oyunu Kapat</button>
-        </div>
-    </div>
-
-    <!-- 15. NEWS ACCORDION FEED MODAL -->
-    <div class="modal" id="newsModal">
-        <h3>📰 Günlük Haber Akışı & Analizi</h3>
-        <button class="ai-btn" id="generateNewsBtn" style="width:100%; justify-content:center;">🌐 Haberleri Çek & Seviyelendir</button>
-        <div id="newsFeedBox" style="display:flex; flex-direction:column; gap:10px; margin-top:10px; max-height:300px; overflow-y:auto;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('newsModal')">Kapat</button></div>
-    </div>
-
-    <!-- 16. REGIONAL ACCENT DECODER MODAL -->
-    <div class="modal" id="accentModal">
-        <h3>🗣 Bölgesel Aksan Kod Çözücü</h3>
-        <select id="accentType">
-            <option value="street">Straattaal (Sokak Ağzı / Gençlik Dili)</option>
-            <option value="amsterdam">Amsterdam Aksanı</option>
-            <option value="brabant">Brabant Şivesi (Zuid-Nederlands)</option>
-            <option value="business">Resmi İş / Politika Flemenkçesi</option>
-        </select>
-        <input type="text" id="accentWordInput" placeholder="İncelemek istediğiniz ifade (Boş bırakılırsa popüler örnekler gelir)">
-        <button class="ai-btn" id="generateAccentBtn" style="width:100%; justify-content:center;">🔊 Aksanı Çözümle</button>
-        <div id="accentResult" class="correction-box" style="display:none; flex-direction: column; gap: 8px;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('accentModal')">Kapat</button></div>
-    </div>
-
-    <!-- 17. MUSIC & LYRICS ANALYSIS MODAL -->
-    <div class="modal" id="lyricsModal">
-        <h3>🎵 Şarkı & Karaoke Linguistik Analiz</h3>
-        <input type="text" id="lyricsSongInput" placeholder="Şarkı adı veya sanatçı (Örn: Marco Borsato)...">
-        <button class="ai-btn" id="generateLyricsBtn" style="width:100%; justify-content:center;">🎶 Şarkı Sözlerini Parçala</button>
-        <div id="lyricsResult" class="correction-box" style="display:none; max-height:260px; overflow-y:auto; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('lyricsModal')">Kapat</button></div>
-    </div>
-
-    <!-- 18. LINGUISTIC DNA MODAL -->
-    <div class="modal" id="linguaDnaModal">
-        <h3>🧠 Linguistik DNA Spektrum Analizi</h3>
-        <textarea id="dnaInput" placeholder="İncelemek istediğiniz Hollandaca metni girin..." style="height: 100px; margin-bottom: 8px;"></textarea>
-        <button class="ai-btn" id="analyzeDnaBtn" style="width: 100%; justify-content: center;">🧠 Analiz Yap</button>
-        <div id="linguaDnaResult" class="correction-box" style="display: none; margin-top: 8px;">DNA modeliniz kart çalışma alışkanlıklarınıza ve hata tiplerinize göre gerçek zamanlı hesaplanır.</div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('linguaDnaModal')">Kapat</button></div>
-    </div>
-
-    <!-- 19. ERROR MUSEUM SHOWCASE MODAL -->
-    <div class="modal" id="errorMuseumModal">
-        <h3>🏛 Kişisel Hata Müzesi Sergisi</h3>
-        <div id="museumStats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;"></div>
-        <div id="errorMuseumList" style="display:flex; flex-direction:column; gap:8px; max-height: 250px; overflow-y: auto;"></div>
-        <button class="ai-btn" id="museumAiBtn" style="width: 100%; justify-content: center; margin-top: 8px;">✨ AI Müze Analizi Yap</button>
-        <div id="museumAiInsight" class="correction-box" style="display: none; margin-top: 8px;"></div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('errorMuseumModal')">Kapat</button></div>
-    </div>
-
-    <!-- 20. SYSTEM STATS DASHBOARD MODAL -->
-    <div class="modal" id="statsModal">
-        <h3>📊 İlerleme & Analitik Dashboard</h3>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-number" id="statsTotalCards">0</div><div class="stat-label">Toplam Kart</div></div>
-            <div class="stat-card green"><div class="stat-number" id="statsLearnedCards">0</div><div class="stat-label">Öğrenilenler</div></div>
-            <div class="stat-card blue"><div class="stat-number" id="statsTotalRepetitions">0</div><div class="stat-label">Tekrarlar</div></div>
-            <div class="stat-card red"><div class="stat-number" id="statsTotalErrors">0</div><div class="stat-label">Toplam Hata</div></div>
-        </div>
-        <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border);">
-            <div style="font-size:12px; font-weight:700; margin-bottom:6px; color:var(--subtle);">📅 Son 7 Gün</div>
-            <div class="week-chart" id="weekChart"></div>
-        </div>
-        <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="font-size: 13px; font-weight: 700;">🎯 Günlük Hedef</span>
-                <span id="dailyGoalText" style="font-size: 12px; color: var(--orange); font-weight: 700;">0 / 10</span>
-            </div>
-            <div style="background: var(--surface3); border-radius: 8px; height: 8px; overflow: hidden;">
-                <div id="dailyGoalBar" style="height: 100%; background: linear-gradient(90deg, var(--orange), var(--green)); border-radius: 8px; transition: width 0.4s; width: 0%;"></div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
-                <span style="font-size: 12px; color: var(--subtle);">Hedef:</span>
-                <input type="number" id="dailyGoalInput" min="1" max="200" value="10" style="width: 70px; background: var(--surface3); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; color: var(--text); font-size: 13px;">
-                <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="saveDailyGoal()">Kaydet</button>
-            </div>
-        </div>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('statsModal')">Kapat</button></div>
-    </div>
-
-    <!-- 21. SETTINGS & AUTO BACKUP MODAL -->
-    <div class="modal" id="settingsModal">
-        <h3>⚙️ Gelişmiş Ayarlar & Veri Güvenliği</h3>
-        <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" id="exportDataBtn">📥 Verileri Dışa Aktar (JSON)</button>
-        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="document.getElementById('importFileInput').click()">📤 Verileri İçe Aktar (JSON)</button>
-        <input type="file" id="importFileInput" style="display:none;" accept=".json">
-        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px; border-color: var(--green);" onclick="document.getElementById('importCsvInput').click()">📊 Toplu Kart İçe Aktar (CSV)</button>
-        <input type="file" id="importCsvInput" style="display:none;" accept=".csv,.txt">
-        <div style="font-size: 11px; color: var(--subtle); margin-bottom: 8px; padding: 8px; background: var(--surface2); border-radius: 10px;">CSV formatı: <code>kelime,anlam,örnek_cümle</code> (her satır bir kart)</div>
-        <button class="btn-danger" style="width:100%;" id="resetApiKeyBtn">🔑 Groq API Anahtarını Sil</button>
-        <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('settingsModal')">Kapat</button></div>
-    </div>
-
-    <!-- 22. MULTI-DECK STUDY MODAL -->
-    <div class="modal" id="multiDeckModal">
-        <h3>🎯 Çalışılacak Desteleri Seç</h3>
-        <div id="multiDeckList" style="display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; padding: 4px; background: var(--surface2); border-radius: 12px; margin-bottom: 12px;"></div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('multiDeckModal')">İptal</button>
-            <button class="btn-primary" id="startMultiDeckBtn">Oturumu Başlat</button>
-        </div>
-    </div>
-
-    <!-- 23. AI KART ÜRETİCİ MODAL -->
-    <div class="modal" id="aiCardGenModal">
-        <h3>🤖 AI Otomatik Kart Üretici</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <input type="text" id="aiGenTopic" placeholder="Konu (Örn: renkler, yiyecekler...)">
-            <select id="aiGenLevel">
-                <option value="A1">A1 Başlangıç</option>
-                <option value="A2">A2 Temel</option>
-                <option value="B1" selected>B1 Orta</option>
-                <option value="B2">B2 Üst Orta</option>
-            </select>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-            <label style="font-size:12px; color:var(--subtle); white-space:nowrap;">Kart sayısı:</label>
-            <input type="number" id="aiGenCount" value="10" min="3" max="30" style="width:70px;">
-            <select id="aiGenDeckTarget" style="flex:1;"></select>
-        </div>
-        <button class="ai-btn" id="aiGenCardsBtn" style="width:100%; justify-content:center;">✨ Kartları Üret</button>
-        <div id="aiGenPreview" style="display:none; max-height:220px; overflow-y:auto; flex-direction:column; gap:6px; -webkit-overflow-scrolling:touch;"></div>
-        <div class="modal-buttons">
-            <button class="btn-secondary" onclick="closeModal('aiCardGenModal')">Kapat</button>
-            <button class="btn-primary" id="aiGenSaveBtn" style="display:none;" onclick="saveAiGeneratedCards()">💾 Tümünü Kaydet</button>
-        </div>
-    </div>
-
-    <!-- PERSISTENT APP STATE SCRIPT ARCHITECTURE -->
-    <script>
         // CORE APPLICATION DATABASE ENGINE (Mevcut CSV yapısıyla tam uyumlu)
         let appData = {
             decks: [
@@ -819,6 +13,7 @@
             stats: { streak: 0, lastStudyDate: null, totalRepetitions: 0, totalErrors: 0 },
             groqKey: null,
             multiDeckIds: [],
+            sessionCompletedIds: [], // Mevcut oturumda başarıyla geçilen kartların ID'lerini tutar
             achievements: [
                 { id: 0, name: "İlk Adım", earned: false },
                 { id: 1, name: "İstikrarlı Öğrenci", earned: false }
@@ -829,7 +24,7 @@
         let activeDeckId = "genel";
         let activeMode = "classic";
         let studyDirection = "NL2TR"; // NL2TR | TR2NL | random
-        let aiContextFetchedForId = null;
+        let aiContextFetchedForId = null; // Hangi kartın AI bağlamının yüklendiğini takip eder
         let sessionHistory = [];
         let matchingSelected = null;
         let matchingAnswers = {};
@@ -841,8 +36,6 @@
         let voiceListening = false;
         let podcastPlaying = false;
         let podcastLines = [];
-        let podcastCurrentLine = 0;
-        let sessionCompletedIds = []; // Mevcut oturumda başarıyla geçilen kartların ID'lerini tutar
         let deferredPrompt = null; // PWA Install event placeholder
 
         // INITIALIZATION LOADER
@@ -857,7 +50,7 @@
             if (!appData.stats) appData.stats = { streak: 0, lastStudyDate: null, totalRepetitions: 0, totalErrors: 0 };
             if (!appData.decks) appData.decks = [];
             if (!appData.multiDeckIds) appData.multiDeckIds = [];
-            if (!appData.errorMuseum) appData.errorMuseum = []; // Hata müzesi için yeni eklenen kısım
+            if (!appData.sessionCompletedIds) appData.sessionCompletedIds = []; // Ensure sessionCompletedIds exists
             if (!appData.cards) appData.cards = [];
             
             // Check for API Key Gate
@@ -870,15 +63,21 @@
             setupEventListeners();
             applyStoredTheme();
             renderSidebar();
-            selectDeck(activeDeckId);
+            selectDeck(activeDeckId); // Initial deck selection and UI update
             updateGlobalStreak();
             registerServiceWorker();
         }
 
         // REGISTER SERVICE WORKER FOR OFFLINE AND PWA INSTALLATION
         function registerServiceWorker() {
-            // sw.js ayrı bir dosya gerektirdiğinden tek dosyalı modda devre dışı bırakıldı.
-            // PWA kurulum banner'ı (beforeinstallprompt) yine de çalışmaya devam eder.
+            // Service Worker, tek bir HTML dosyası olarak çalıştırıldığında genellikle ayrı bir dosya gerektirir.
+            // Bu nedenle, tek dosya modunda PWA çevrimdışı yetenekleri ve yükleme özelliği devre dışı bırakılmıştır.
+            // Eğer PWA özelliklerini istiyorsanız, sw.js dosyasını ayrı tutmanız ve aşağıdaki satırları etkinleştirmeniz gerekir.
+            // if ('serviceWorker' in navigator) {
+            //     navigator.serviceWorker.register('/sw.js')
+            //         .then(registration => { console.log('Service Worker registered with scope:', registration.scope); })
+            //         .catch(error => console.error('Service Worker registration failed:', error));
+            // }
 
             // PWA Kurulum tetikleyicisini dinle
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -1342,76 +541,34 @@ function save() {
             document.getElementById("newCount").textContent = newCards.length;
             document.getElementById("dueCount").textContent = dueCards.length;
             document.getElementById("totalCount").textContent = allFiltered.length;
-            document.getElementById("sessionCount").textContent = sessionCompletedIds.length;
 
-            // Yeni updateProgress fonksiyonu
-            const progressFill = document.getElementById("progressBarFill");
-            if (!progressFill) return;
-            let totalCardsInActiveDeck = 0;
-            if (activeDeckId === "all") {
-                totalCardsInActiveDeck = appData.cards.length;
-            } else if (activeDeckId === "multi") {
-                totalCardsInActiveDeck = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId)).length;
-            } else {
-                totalCardsInActiveDeck = appData.cards.filter(c => c.deckId === activeDeckId).length;
-            }
-            if (totalCardsInActiveDeck === 0) { progressFill.style.width = "0%"; return; }
-            const done = sessionCompletedIds.filter(id => appData.cards.find(c => c.id === id && (c.deckId === activeDeckId || activeDeckId === "all"))).length;
-            const percent = Math.min(Math.round((done / totalCardsInActiveDeck) * 100), 100);
-            progressFill.style.width = `${percent}%`;
-            document.getElementById("progressText").textContent = `Bugün ${done}/${totalCardsInActiveDeck} kart tamamlandı (%${percent})`;
-            // OTURUM MANTIĞI: Henüz bu oturumda tamamlanmamış (bilinmemiş) kartları filtrele
-            let availableCards = allFiltered.filter(c => !sessionCompletedIds.includes(c.id));
+            let pool = dueCards.length > 0 ? dueCards : (newCards.length > 0 ? newCards : allFiltered);
 
-            // Eğer tüm kartlar en az bir kez başarıyla geçildiyse döngüyü sıfırla
-            if (availableCards.length === 0 && allFiltered.length > 0) {
-                sessionCompletedIds = [];
-                availableCards = allFiltered;
-                showToast("Deste tamamlandı, baştan başlanıyor...", "var(--purple)");
+            // Aynı kartın üst üste gelmesini engelle (Eğer pool'da birden fazla seçenek varsa)
+            if (pool.length > 1 && currentCard) {
+                pool = pool.filter(c => c.id !== currentCard.id);
             }
 
-            if (availableCards.length > 0) {
-                // Havuz içinde önceliklendirme: Vadesi Gelenler > Yeni Kartlar > Diğerleri
-                let pool = [];
-                const dueInAvailable = availableCards.filter(c => dueCards.some(dc => dc.id === c.id));
-                const newInAvailable = availableCards.filter(c => newCards.some(nc => nc.id === c.id));
-
-                if (dueInAvailable.length > 0) pool = dueInAvailable;
-                else if (newInAvailable.length > 0) pool = newInAvailable;
-                else pool = availableCards;
-
-                // Aynı kartın üst üste gelmesini engelle
-                if (pool.length > 1 && currentCard) {
-                    pool = pool.filter(c => c.id !== currentCard.id);
-                }
-
+            if (pool.length > 0) {
                 currentCard = pool[Math.floor(Math.random() * pool.length)];
-                
                 renderCurrentCardMode();
                 setActionButtonsState(true);
 
                 // EKSİKLİK 2: Otomatik Ses Çalma (UX İyileştirmesi)
-                const isReversed = (studyDirection === "TR2NL" || (studyDirection === "random" && Math.random() > 0.5)); // Bu satır zaten vardı
+                const isReversed = (studyDirection === "TR2NL" || (studyDirection === "random" && Math.random() > 0.5));
                 if (!isReversed) {
                     setTimeout(() => speakTts(currentCard.word, "nl-NL"), 600);
                 }
-
-                // Progress text: kaç kart vadesi gelmiş
-                document.getElementById("progressText").textContent =
-                    dueCards.length > 0 || newCards.length > 0
-                        ? `🎯 Hedef: Tüm kartları yeşile çevir!`
-                        : `🎉 Tebrikler! Bu destedeki tüm vadesi gelen kartları bitirdiniz.`;
-                if (dueCards.length === 0 && allFiltered.length > 0 && newCards.length === 0) triggerConfetti();
             } else {
                 currentCard = null;
                 document.getElementById("cardFrontWord").textContent = "Kart Yok";
                 document.getElementById("cardBackMeaning").textContent = "Lütfen Bu Desteye Kart Ekleyin";
                 setActionButtonsState(false);
             }
-            updateProgress(); // Bu satır zaten vardı
+            updateProgress();
         }
 
-        function renderCurrentCardMode() { // Bu fonksiyon zaten vardı
+        function renderCurrentCardMode() {
             if (!currentCard) return;
             const cardEl = document.getElementById("mainCard");
             cardEl.classList.remove("flipped");
@@ -1632,6 +789,11 @@ function save() {
             if (q === 0) {
                 // Again: tekrar için kartı hemen yeniden vadelendir.
                 currentCard.interval = 0;
+                // If the card was previously marked as completed in this session, remove it.
+                const index = sessionCompletedIds.indexOf(currentCard.id);
+                if (index > -1) {
+                    sessionCompletedIds.splice(index, 1);
+                }
                 currentCard.repetitions = 0;
             } else {
                 if (currentCard.interval === 0) {
@@ -1640,6 +802,9 @@ function save() {
                     currentCard.interval = 6;
                 } else {
                     currentCard.interval = Math.round(currentCard.interval * currentCard.ease);
+                }
+                if (!sessionCompletedIds.includes(currentCard.id)) {
+                    sessionCompletedIds.push(currentCard.id);
                 }
                 currentCard.repetitions++;
             }
@@ -1691,17 +856,16 @@ function save() {
             save();
             showToast(`${rating === "again" ? "↩ Tekrar" : rating === "hard" ? "😅 Zor" : rating === "good" ? "✓ İyi" : "⚡ Kolay"}`, 
                       rating === "again" ? "var(--red)" : rating === "hard" ? "var(--orange)" : rating === "good" ? "var(--green)" : "var(--blue)");
-            selectDeck(activeDeckId); // Bu satır zaten vardı
-            
+            selectDeck(activeDeckId); // This will trigger updateProgress internally.
         }
-        
+
         // AI MULTIMEDIA CONTEXT ENGINE
         function flipCard() {
             const card = document.getElementById("mainCard");
             card.classList.toggle("flipped");
             
             if (card.classList.contains("flipped") && currentCard && aiContextFetchedForId !== currentCard.id && appData.groqKey) {
-                fetchGroqMultimediaContext(currentCard.word); // fetchAiContext yerine fetchGroqMultimediaContext kullanıldı
+                fetchGroqMultimediaContext(currentCard.word);
             }
         }
 
@@ -1762,34 +926,36 @@ function save() {
                 if (last.prevEase !== undefined) card.ease = last.prevEase;
                 save();
             }
+            sessionCompletedIds = sessionCompletedIds.filter(id => id !== last.cardId); // Remove from sessionCompletedIds on undo
             showToast("Son hamle geri alındı.", "var(--purple)");
             selectDeck(activeDeckId);
         }
 
         // TEXT TO SPEECH SERVICE - Safari uyumlu
-        function speakTts(text, lang) { // Bu fonksiyon zaten vardı
-            if (!('speechSynthesis' in window)) return;
-            // Web Speech API entegrasyonu
-            window.speechSynthesis.cancel(); // Önceki sesleri sustur
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = lang;
-            window.speechSynthesis.speak(msg);
-        }
-
-        function closeAllDrawers() { // Bu fonksiyon zaten vardı
-            closeSidebar();
-            document.querySelectorAll(".modal").forEach(m => m.classList.remove("open"));
-        }
-        
-        function openModal(id) { // Bu fonksiyon zaten vardı
-            closeAllDrawers();
-            const m = document.getElementById(id);
-            if (m) m.classList.add("open");
-        }
-        
-        function closeModal(id) { // Bu fonksiyon zaten vardı
-            const m = document.getElementById(id);
-            if (m) m.classList.remove("open");
+        function speakTts(text, lang) {
+            if (!('speechSynthesis' in window)) {
+                showToast("TTS tarayıcınızda desteklenmiyor.", "var(--red)");
+                return;
+            }
+            // Safari'de önceki konuşmayı durdur
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.9;
+            // Safari'de ses listesi gecikmeli yüklenir
+            const trySpeak = () => {
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    const preferred = voices.find(v => v.lang && v.lang.startsWith(lang.split('-')[0]));
+                    if (preferred) utterance.voice = preferred;
+                }
+                window.speechSynthesis.speak(utterance);
+            };
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.onvoiceschanged = trySpeak;
+            } else {
+                trySpeak();
+            }
         }
 
         // ASYNC GROQ AI NETWORK AGENT WITH ACCURATE MULTILINGUAL RULES
@@ -1962,6 +1128,7 @@ function save() {
             if (data && Array.isArray(data.lines)) {
                 podcastLines = data.lines;
                 document.getElementById("podcastStatusText").textContent = "Yayın Hazır! (" + podcastLines.length + " satır)";
+                podcastCurrentLine = 0; // Reset current line for new podcast
                 playBtn.disabled = false;
                 playBtn.onclick = () => {
                     podcastCurrentLine = 0;
@@ -2721,15 +1888,15 @@ function save() {
             aiGeneratedCards = [];
         }
 
-        function saveDailyGoal() { // Bu fonksiyon zaten vardı
-            const val = parseInt(document.getElementById("dailyGoalInput").value) || 10; // Bu satır zaten vardı
-            appData.stats.dailyGoal = val; // Bu satır zaten vardı
-            save(); // Bu satır zaten vardı
-            updateProgress(); // Bu satır zaten vardı
-            showToast(`Günlük hedef ${val} kart olarak ayarlandı.`, "var(--green)"); // Bu satır zaten vardı
+        function saveDailyGoal() {
+            const val = parseInt(document.getElementById("dailyGoalInput").value) || 10;
+            appData.stats.dailyGoal = val;
+            save();
+            updateProgress();
+            showToast(`Günlük hedef ${val} kart olarak ayarlandı.`, "var(--green)");
         }
 
-        function updateProgress() { // Bu fonksiyon zaten vardı
+        function updateProgress() {
             let currentAreaCount = 0;
             if (activeDeckId === "all") {
                 currentAreaCount = appData.cards.length;
@@ -2742,27 +1909,20 @@ function save() {
             const learnedCount = appData.cards.filter(c => (c.repetitions || 0) > 0).length;
             const progressPercent = appData.cards.length > 0 ? (learnedCount / appData.cards.length) * 100 : 0;
 
+            // UI Sayacı Güncelleme
+            const dueCards = getDueCards(currentAreaCards);
+            const newCards = currentAreaCards.filter(c => !c.repetitions || c.repetitions === 0);
+            document.getElementById("newCount").textContent = newCards.length;
+            document.getElementById("dueCount").textContent = dueCards.length;
+            document.getElementById("totalCount").textContent = totalCardsInActiveDeck;
+            document.getElementById("sessionCount").textContent = sessionCompletedIds.length;
+
             document.getElementById("statsTotalCards").textContent = appData.cards.length;
             document.getElementById("statsLearnedCards").textContent = learnedCount;
             document.getElementById("statsTotalRepetitions").textContent = appData.stats.totalRepetitions;
             document.getElementById("statsTotalErrors").textContent = appData.stats.totalErrors;
-            document.getElementById("sessionCount").textContent = sessionCompletedIds.length;
             
             const currentTodayReps = appData.stats.todayReps || 0;
-            const currentGoal = appData.stats.dailyGoal || 10; // Bu satır zaten vardı
-            document.getElementById("progressText").textContent = `Bugün ${currentTodayReps} kart çalışıldı (Hedef: ${currentGoal})`; // Bu satır zaten vardı
-
-            document.getElementById("progressBarFill").style.width = `${progressPercent}%`; // Bu satır zaten vardı
-
-            const goalPercent = Math.min((currentTodayReps / currentGoal) * 100, 100); // Bu satır zaten vardı
-            const goalBar = document.getElementById("dailyGoalBar"); // Bu satır zaten vardı
-            const goalText = document.getElementById("dailyGoalText"); // Bu satır zaten vardı
-            const goalInput = document.getElementById("dailyGoalInput"); // Bu satır zaten vardı
-            if (goalBar) goalBar.style.width = `${goalPercent}%`; // Bu satır zaten vardı
-            if (goalText) goalText.textContent = `${currentTodayReps} / ${currentGoal}`; // Bu satır zaten vardı
-            if (goalInput) goalInput.value = currentGoal; // Bu satır zaten vardı
-
-            renderWeekChart(); // Bu satır zaten vardı
             const currentGoal = appData.stats.dailyGoal || 10;
             document.getElementById("progressText").textContent = `Bugün ${currentTodayReps} kart çalışıldı (Hedef: ${currentGoal})`;
 
@@ -2777,11 +1937,11 @@ function save() {
             if (goalInput) goalInput.value = currentGoal;
 
             renderWeekChart();
-        }
 
-        function updateGlobalStreak() {
-            const sc = document.getElementById("streakCount");
-            if (sc) sc.textContent = appData.stats.streak || 0;
+            // Trigger confetti if all cards in the active deck are completed (no new or due cards)
+            if (dueCards.length === 0 && newCards.length === 0 && totalCardsInActiveDeck > 0) {
+                triggerConfetti();
+            }
         }
 
         // SYSTEM BACKUP MANAGER
@@ -2959,28 +2119,28 @@ function save() {
         }
 
         // TOAST ENGINE & DRAWERS WINDOWS CONTROLLER
-        function showToast(text, color = "var(--orange)") { // Bu fonksiyon zaten vardı
-            const t = document.getElementById("toast");
-            t.textContent = text;
-            t.style.background = color;
-            t.classList.add("show");
-            setTimeout(() => t.classList.remove("show"), 2500);
+        function showToast(text, bg) {
+            const toast = document.getElementById("toast");
+            toast.textContent = text;
+            toast.style.background = bg || "var(--orange)";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
         }
 
-        function openModal(id) { // Bu fonksiyon zaten vardı
+        function openModal(id) {
             closeAllDrawers();
-            const m = document.getElementById(id);
-            if (m) m.classList.add("open");
+            document.getElementById(id).classList.add("open");
+            document.getElementById("overlay").classList.add("show");
             
             // Dynamic render calls on open if applicable
-            if(id === "weaknessModal") { // Bu kısım zaten vardı
-                let list = document.getElementById("weaknessListContainer"); list.innerHTML = ""; // Bu kısım zaten vardı
-                appData.cards.filter(c => (c.wrong || 0) > 0).forEach(c => { // Bu kısım zaten vardı
-                    let div = document.createElement("div"); div.className = "weakness-item"; // Bu kısım zaten vardı
-                    div.innerHTML = `<strong>${c.word}</strong><p>Hata Payı: ${c.wrong} Kez | Anlamı: ${c.meaning}</p>`; // Bu kısım zaten vardı
-                    list.appendChild(div); // Bu kısım zaten vardı
-                }); // Bu kısım zaten vardı
-                if(!list.innerHTML) list.innerHTML = "Harika! Şu an kronik zayıf kartınız bulunmuyor."; // Bu kısım zaten vardı
+            if(id === "weaknessModal") {
+                let list = document.getElementById("weaknessListContainer"); list.innerHTML = "";
+                appData.cards.filter(c => (c.wrong || 0) > 0).forEach(c => {
+                    let div = document.createElement("div"); div.className = "weakness-item";
+                    div.innerHTML = `<strong>${c.word}</strong><p>Hata Payı: ${c.wrong} Kez | Anlamı: ${c.meaning}</p>`;
+                    list.appendChild(div);
+                });
+                if(!list.innerHTML) list.innerHTML = "Harika! Şu an kronik zayıf kartınız bulunmuyor.";
             } else if(id === "errorMuseumModal") {
                 renderErrorMuseum();
             } else if(id === "matchingModal") {
@@ -3000,14 +2160,18 @@ function save() {
             modal.classList.toggle("fullscreen");
         }
 
-        function closeModal(id) { // Bu fonksiyon zaten vardı
-            const m = document.getElementById(id);
-            if (m) m.classList.remove("open");
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove("open");
+            modal.classList.remove("fullscreen"); // Kapatınca odak modundan çık
+            if (!document.querySelector(".modal.open")) {
+                document.getElementById("overlay").classList.remove("show");
+            }
         }
 
-        function closeAllDrawers() { // Bu fonksiyon zaten vardı
-            closeSidebar(); // Bu satır zaten vardı
-            document.querySelectorAll(".modal").forEach(m => m.classList.remove("open")); // Bu satır zaten vardı
+        function closeAllDrawers() {
+            closeSidebar();
+            document.querySelectorAll(".modal").forEach(m => m.classList.remove("open"));
         }
 
         // CONFETTI CANVAS EFFECT
@@ -3051,9 +2215,7 @@ function save() {
         // TRIGGER ON APPLICATION READY
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initApp);
-        } else { // Bu kısım zaten vardı
+        } else {
             initApp();
         }
-    </script>
-</body>
-</html>
+    
