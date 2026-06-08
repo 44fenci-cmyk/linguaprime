@@ -841,6 +841,8 @@
         let podcastPlaying = false;
         let podcastLines = [];
         let podcastCurrentLine = 0;
+        let sessionSeenCardIds = []; // Mevcut çalışma oturumunda görülen kartların ID'lerini tutar
+        const SESSION_SEEN_LIMIT = 15; // Bir kartın tekrar görünmeden önce kaç farklı kartın gösterileceği limiti
         let deferredPrompt = null; // PWA Install event placeholder
 
         // INITIALIZATION LOADER
@@ -1341,7 +1343,7 @@ function save() {
             document.getElementById("totalCount").textContent = allFiltered.length;
 
             let pool = dueCards.length > 0 ? dueCards : (newCards.length > 0 ? newCards : allFiltered);
-
+            
             // Aynı kartın üst üste gelmesini engelle (Eğer pool'da birden fazla seçenek varsa)
             if (pool.length > 1 && currentCard) {
                 pool = pool.filter(c => c.id !== currentCard.id);
@@ -1349,6 +1351,49 @@ function save() {
 
             if (pool.length > 0) {
                 currentCard = pool[Math.floor(Math.random() * pool.length)];
+                
+                // Yeni kart seçme mantığı: Yakın zamanda görülen kartları daha az öncelikli yap
+                let eligibleCards = [];
+
+                // 1. Vadesi gelen ve yakın zamanda görülmemiş kartları önceliklendir
+                let candidates = dueCards.filter(c => !sessionSeenCardIds.includes(c.id));
+                if (candidates.length > 0) {
+                    eligibleCards.push(...candidates);
+                }
+
+                // 2. Yeterli vadesi gelen kart yoksa, yeni ve yakın zamanda görülmemiş kartları ekle
+                if (eligibleCards.length < 5) { // Rastgele bir eşik, çeşitliliği sağlamak için
+                    candidates = newCards.filter(c => !sessionSeenCardIds.includes(c.id));
+                    eligibleCards.push(...candidates);
+                }
+
+                // 3. Hala yeterli kart yoksa, öğrenilmiş ve yakın zamanda görülmemiş kartları ekle
+                if (eligibleCards.length < 5) {
+                    const learnedAndNotDue = allFiltered.filter(c => c.repetitions > 0 && !dueCards.some(dc => dc.id === c.id));
+                    candidates = learnedAndNotDue.filter(c => !sessionSeenCardIds.includes(c.id));
+                    eligibleCards.push(...candidates);
+                }
+
+                // 4. Eğer hiç uygun kart kalmadıysa (yani tüm kartlar yakın zamanda görüldüyse veya çok az kart varsa),
+                //    sessionSeenCardIds listesini sıfırla ve tüm kartları tekrar uygun hale getir.
+                if (eligibleCards.length === 0 && allFiltered.length > 0) {
+                    sessionSeenCardIds = []; // "Yakın zamanda görülen" listesini sıfırla
+                    eligibleCards = [...allFiltered]; // Tüm kartlar tekrar uygun
+                } else if (eligibleCards.length === 0 && allFiltered.length === 0) {
+                    currentCard = null;
+                    document.getElementById("cardFrontWord").textContent = "Kart Yok";
+                    document.getElementById("cardBackMeaning").textContent = "Lütfen Bu Desteye Kart Ekleyin";
+                    setActionButtonsState(false);
+                    updateProgress();
+                    return;
+                }
+
+                // Seçilen kartı sessionSeenCardIds listesine ekle, limiti koru
+                currentCard = eligibleCards[Math.floor(Math.random() * eligibleCards.length)];
+                sessionSeenCardIds.push(currentCard.id);
+                if (sessionSeenCardIds.length > SESSION_SEEN_LIMIT) {
+                    sessionSeenCardIds.shift(); // En eski görülen kartı listeden çıkar
+                }
                 renderCurrentCardMode();
                 setActionButtonsState(true);
 
@@ -1654,6 +1699,7 @@ function save() {
             showToast(`${rating === "again" ? "↩ Tekrar" : rating === "hard" ? "😅 Zor" : rating === "good" ? "✓ İyi" : "⚡ Kolay"}`, 
                       rating === "again" ? "var(--red)" : rating === "hard" ? "var(--orange)" : rating === "good" ? "var(--green)" : "var(--blue)");
             selectDeck(activeDeckId);
+            
         }
 
         // AI MULTIMEDIA CONTEXT ENGINE
