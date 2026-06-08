@@ -78,13 +78,16 @@
         /* MAIN AREA */
         .main { height: 100%; height: -webkit-fill-available; display: flex; flex-direction: column; overflow: hidden; padding-top: calc(70px + env(safe-area-inset-top)); }
         .card-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 16px 4px; position: relative; min-height: 0; }
-        .card-container { width: 100%; max-width: 560px; -webkit-perspective: 1400px; perspective: 1400px; }
-        .card { width: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; -webkit-transition: -webkit-transform 0.5s cubic-bezier(.4,0,.2,1); transition: transform 0.5s cubic-bezier(.4,0,.2,1), -webkit-transform 0.5s cubic-bezier(.4,0,.2,1); cursor: pointer; border-radius: var(--radius); }
+        .card-container { width: 100%; max-width: 560px; -webkit-perspective: 1400px; perspective: 1400px; overflow: visible; }
+        .card { width: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; -webkit-transition: -webkit-transform 0.6s cubic-bezier(.4,0,.2,1); transition: transform 0.6s cubic-bezier(.4,0,.2,1); cursor: pointer; border-radius: var(--radius); }
         .card.flipped { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
-        .card-face { -webkit-backface-visibility: hidden; backface-visibility: hidden; -webkit-transform: translateZ(0); background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 24px; min-height: clamp(220px, 42vh, 380px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+        .card-face { -webkit-backface-visibility: hidden; backface-visibility: hidden; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 24px; min-height: clamp(220px, 42vh, 380px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
         body.light .card-face { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
-        .card-front { -webkit-transform: rotateY(0deg) translateZ(1px); transform: rotateY(0deg) translateZ(1px); }
-        .card-back { -webkit-transform: rotateY(180deg) translateZ(1px); transform: rotateY(180deg) translateZ(1px); position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; }
+        .card-front { -webkit-transform: rotateY(0deg); transform: rotateY(0deg); z-index: 2; }
+        .card-back { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; z-index: 1; }
+        /* iOS Safari'de ters dönen yüzün ön tarafta kalmasını engellemek için ek katman */
+        .card.flipped .card-front { z-index: 1; }
+        .card.flipped .card-back { z-index: 2; }
         .word { font-size: 32px; font-weight: 800; margin: 12px 0; line-height: 1.25; letter-spacing: -0.5px; }
         .meaning { font-size: 20px; font-weight: 600; color: var(--orange); margin: 8px 0; }
         .sentence { font-size: 14px; color: var(--subtle); font-style: italic; margin-top: 10px; max-width: 90%; }
