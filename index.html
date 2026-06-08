@@ -391,6 +391,7 @@
         <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px; font-size: 11px; font-weight: 700;">
             <span style="color: var(--blue);">YENİ: <span id="newCount">0</span></span>
             <span style="color: var(--red);">TEKRAR: <span id="dueCount">0</span></span>
+            <span style="color: var(--purple);">OTURUM: <span id="sessionCount">0</span></span>
             <span style="color: var(--green);">TOPLAM: <span id="totalCount">0</span></span>
         </div>
 
@@ -841,8 +842,7 @@
         let podcastPlaying = false;
         let podcastLines = [];
         let podcastCurrentLine = 0;
-        let sessionSeenCardIds = []; // Mevcut çalışma oturumunda görülen kartların ID'lerini tutar
-        const SESSION_SEEN_LIMIT = 15; // Bir kartın tekrar görünmeden önce kaç farklı kartın gösterileceği limiti
+        let sessionCompletedIds = []; // Mevcut oturumda başarıyla geçilen kartlar
         let deferredPrompt = null; // PWA Install event placeholder
 
         // INITIALIZATION LOADER
@@ -1341,59 +1341,35 @@ function save() {
             document.getElementById("newCount").textContent = newCards.length;
             document.getElementById("dueCount").textContent = dueCards.length;
             document.getElementById("totalCount").textContent = allFiltered.length;
+            document.getElementById("sessionCount").textContent = sessionCompletedIds.length;
 
-            let pool = dueCards.length > 0 ? dueCards : (newCards.length > 0 ? newCards : allFiltered);
-            
-            // Aynı kartın üst üste gelmesini engelle (Eğer pool'da birden fazla seçenek varsa)
-            if (pool.length > 1 && currentCard) {
-                pool = pool.filter(c => c.id !== currentCard.id);
+            // OTURUM MANTIĞI: Henüz bu oturumda tamamlanmamış (bilinmemiş) kartları filtrele
+            let availableCards = allFiltered.filter(c => !sessionCompletedIds.includes(c.id));
+
+            // Eğer tüm kartlar en az bir kez başarıyla geçildiyse döngüyü sıfırla
+            if (availableCards.length === 0 && allFiltered.length > 0) {
+                sessionCompletedIds = [];
+                availableCards = allFiltered;
+                showToast("Deste tamamlandı, baştan başlanıyor...", "var(--purple)");
             }
 
-            if (pool.length > 0) {
+            if (availableCards.length > 0) {
+                // Havuz içinde önceliklendirme: Vadesi Gelenler > Yeni Kartlar > Diğerleri
+                let pool = [];
+                const dueInAvailable = availableCards.filter(c => dueCards.some(dc => dc.id === c.id));
+                const newInAvailable = availableCards.filter(c => newCards.some(nc => nc.id === c.id));
+
+                if (dueInAvailable.length > 0) pool = dueInAvailable;
+                else if (newInAvailable.length > 0) pool = newInAvailable;
+                else pool = availableCards;
+
+                // Aynı kartın üst üste gelmesini engelle
+                if (pool.length > 1 && currentCard) {
+                    pool = pool.filter(c => c.id !== currentCard.id);
+                }
+
                 currentCard = pool[Math.floor(Math.random() * pool.length)];
                 
-                // Yeni kart seçme mantığı: Yakın zamanda görülen kartları daha az öncelikli yap
-                let eligibleCards = [];
-
-                // 1. Vadesi gelen ve yakın zamanda görülmemiş kartları önceliklendir
-                let candidates = dueCards.filter(c => !sessionSeenCardIds.includes(c.id));
-                if (candidates.length > 0) {
-                    eligibleCards.push(...candidates);
-                }
-
-                // 2. Yeterli vadesi gelen kart yoksa, yeni ve yakın zamanda görülmemiş kartları ekle
-                if (eligibleCards.length < 5) { // Rastgele bir eşik, çeşitliliği sağlamak için
-                    candidates = newCards.filter(c => !sessionSeenCardIds.includes(c.id));
-                    eligibleCards.push(...candidates);
-                }
-
-                // 3. Hala yeterli kart yoksa, öğrenilmiş ve yakın zamanda görülmemiş kartları ekle
-                if (eligibleCards.length < 5) {
-                    const learnedAndNotDue = allFiltered.filter(c => c.repetitions > 0 && !dueCards.some(dc => dc.id === c.id));
-                    candidates = learnedAndNotDue.filter(c => !sessionSeenCardIds.includes(c.id));
-                    eligibleCards.push(...candidates);
-                }
-
-                // 4. Eğer hiç uygun kart kalmadıysa (yani tüm kartlar yakın zamanda görüldüyse veya çok az kart varsa),
-                //    sessionSeenCardIds listesini sıfırla ve tüm kartları tekrar uygun hale getir.
-                if (eligibleCards.length === 0 && allFiltered.length > 0) {
-                    sessionSeenCardIds = []; // "Yakın zamanda görülen" listesini sıfırla
-                    eligibleCards = [...allFiltered]; // Tüm kartlar tekrar uygun
-                } else if (eligibleCards.length === 0 && allFiltered.length === 0) {
-                    currentCard = null;
-                    document.getElementById("cardFrontWord").textContent = "Kart Yok";
-                    document.getElementById("cardBackMeaning").textContent = "Lütfen Bu Desteye Kart Ekleyin";
-                    setActionButtonsState(false);
-                    updateProgress();
-                    return;
-                }
-
-                // Seçilen kartı sessionSeenCardIds listesine ekle, limiti koru
-                currentCard = eligibleCards[Math.floor(Math.random() * eligibleCards.length)];
-                sessionSeenCardIds.push(currentCard.id);
-                if (sessionSeenCardIds.length > SESSION_SEEN_LIMIT) {
-                    sessionSeenCardIds.shift(); // En eski görülen kartı listeden çıkar
-                }
                 renderCurrentCardMode();
                 setActionButtonsState(true);
 
@@ -2754,6 +2730,7 @@ function save() {
             document.getElementById("statsLearnedCards").textContent = learnedCount;
             document.getElementById("statsTotalRepetitions").textContent = appData.stats.totalRepetitions;
             document.getElementById("statsTotalErrors").textContent = appData.stats.totalErrors;
+            document.getElementById("sessionCount").textContent = sessionCompletedIds.length;
             
             const currentTodayReps = appData.stats.todayReps || 0;
             const currentGoal = appData.stats.dailyGoal || 10;
