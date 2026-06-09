@@ -26,6 +26,11 @@
             --card-bg: rgba(255, 255, 255, 0.05); --radius: 22px; --font: 'DM Sans', system-ui, sans-serif;
         }
         
+        body.oled {
+            --bg: #000000; --surface: #0a0a0a; --surface2: #121212; --surface3: #1a1a1a;
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
         body.light {
             --bg: #F0F2F5; --surface: #FFFFFF; --surface2: #F3F4F6; --surface3: #E5E7EB;
             --border: rgba(0,0,0,0.08); --text: #111827; --muted: #9CA3AF; --subtle: #6B7280;
@@ -487,6 +492,7 @@
                     <div class="card-face card-back">
                         <div class="meaning" id="cardBackMeaning">Deste Seçin veya Kart Ekleyin</div>
                         <div class="sentence" id="cardBackSentence">Örnek cümle burada görünecektir.</div>
+                        <div id="cardMnemonic" style="margin-top:12px; font-size:12px; color:var(--purple); font-style:italic; border-top:1px dashed var(--border); padding-top:8px; display:none;"></div>
                         <button class="tts-btn" id="backTTSBtn">🔊 Anlamı Oku (TR)</button>
                         <div id="cardAccuracyBadge" style="margin-top:10px; font-size:11px; color:var(--subtle); font-weight:600;"></div>
                         <div class="learning-level-container">
@@ -820,6 +826,11 @@
         <button class="btn-secondary" style="width: 100%; margin-bottom: 8px; border-color: var(--green);" onclick="document.getElementById('importCsvInput').click()">📊 Toplu Kart İçe Aktar (CSV)</button>
         <input type="file" id="importCsvInput" style="display:none;" accept=".csv,.txt">
         <div style="font-size: 11px; color: var(--subtle); margin-bottom: 8px; padding: 8px; background: var(--surface2); border-radius: 10px;">CSV formatı: <code>kelime,anlam,örnek_cümle</code> (her satır bir kart)</div>
+        <div style="margin-top:10px; padding:10px; border-top:1px solid var(--border);">
+            <label style="display:flex; align-items:center; gap:10px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" id="oledToggle" style="width:18px; height:18px;"> 🌑 OLED Saf Siyah Modu
+            </label>
+        </div>
         <button class="btn-danger" style="width:100%;" id="resetApiKeyBtn">🔑 Groq API Anahtarını Sil</button>
         <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('settingsModal')">Kapat</button></div>
     </div>
@@ -1028,6 +1039,12 @@ function save() {
                 save();
                 applyDyslexicPreference();
             };
+            
+            const oledToggle = document.getElementById("oledToggle");
+            if (oledToggle) oledToggle.onchange = (e) => {
+                document.body.classList.toggle("oled", e.target.checked);
+                localStorage.setItem("linguaprime_oled", e.target.checked);
+            };
 
             // Deste renk seçici
             document.addEventListener("click", (e) => {
@@ -1145,7 +1162,7 @@ function save() {
                         window.isDraggingCard = true;
                         if (e.cancelable) e.preventDefault();
                         const opacity = Math.min(Math.abs(dx) / SWIPE_THRESHOLD, 1);
-                        card.style.transform = `translate3d(${dx * 0.4}px, 0, 0) rotate(${dx * 0.03}deg)`;
+                        card.style.transform = `translate3d(${dx * 0.4}px, 0, 0) rotate(${dx * 0.08}deg)`;
                         const rightIcon = card.querySelector('.swipe-icon.right');
                         const leftIcon = card.querySelector('.swipe-icon.left');
                         if (rightIcon) rightIcon.style.opacity = dx > 0 ? opacity : 0;
@@ -1442,6 +1459,9 @@ function save() {
                 document.getElementById("cardFrontWord").textContent = frontText;
                 document.getElementById("cardBackMeaning").textContent = backText;
                 document.getElementById("cardBackSentence").textContent = currentCard.sentence || "Örnek cümle bulunmuyor.";
+                const mnemonicBox = document.getElementById("cardMnemonic");
+                if (mnemonicBox) { mnemonicBox.textContent = currentCard.mnemonic || ""; mnemonicBox.style.display = currentCard.mnemonic ? "block" : "none"; }
+                
                 // Doğruluk oranı
                 const totalAns = (currentCard.repetitions || 0) + (currentCard.wrong || 0);
                 const accuracy = totalAns > 0 ? Math.round((1 - (currentCard.wrong || 0) / totalAns) * 100) : null;
@@ -1628,6 +1648,7 @@ function save() {
             if(normalizeForComparison(userAns) === normalizeForComparison(target)) {
                 showToast("Mükemmel! Cümle dizilimi doğru.", "var(--green)");
                 triggerConfetti();
+                speakTts(target, "nl-NL"); // Bilişsel Nörobilimci Tavsiyesi: İşitsel Pekiştirme
                 document.getElementById("mainCard").classList.add("flipped");
                 handleAnswer("good");
             } else {
@@ -1731,7 +1752,25 @@ function save() {
             save();
             showToast(`${rating === "again" ? "↩ Tekrar" : rating === "hard" ? "😅 Zor" : rating === "good" ? "✓ İyi" : "⚡ Kolay"}`, 
                       rating === "again" ? "var(--red)" : rating === "hard" ? "var(--orange)" : rating === "good" ? "var(--green)" : "var(--blue)");
+            
+            // Başarı kontrolü (Gamification)
+            checkAchievements();
+            
             selectDeck(activeDeckId);
+        }
+
+        function checkAchievements() {
+            const reps = appData.stats.totalRepetitions || 0;
+            if (reps === 10 && !appData.achievements[0].earned) {
+                appData.achievements[0].earned = true;
+                showToast("🏆 Başarı Açıldı: İlk Adım!", "var(--purple)");
+                triggerConfetti();
+            }
+            if ((appData.stats.streak || 0) >= 5 && !appData.achievements[1].earned) {
+                appData.achievements[1].earned = true;
+                showToast("🔥 Başarı Açıldı: İstikrarlı Öğrenci!", "var(--orange)");
+                triggerConfetti();
+            }
         }
 
         function triggerUndo() {
@@ -1811,12 +1850,17 @@ function save() {
                         temperature: 0.3
                     })
                 });
+                
+                if (response.status === 429) {
+                    throw new Error("Groq API Kotası Doldu! Lütfen biraz bekleyin.");
+                }
                 if(!response.ok) throw new Error("API isteği başarısız oldu.");
                 const resData = await response.json();
                 return resData.choices[0].message.content;
-            } catch(e) {
-                console.warn("Gerçek bağlantı kurulamadı, akıllı simülasyon çalıştırılıyor.");
-                return getMockAiResponse(prompt);
+            } catch (error) {
+                console.error("AI Hatası:", error);
+                showToast(error.message || "Bağlantı Hatası!", "var(--red)");
+                return getMockAiResponse(prompt); // Fallback to mock
             }
         }
 
