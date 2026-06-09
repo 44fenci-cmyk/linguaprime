@@ -988,7 +988,8 @@
         const MASCOTS = {
             happy: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#F97316" fill-opacity="0.1" stroke="#F97316" stroke-width="2"/><circle cx="35" cy="40" r="5" fill="#F97316"/><circle cx="65" cy="40" r="5" fill="#F97316"/><path d="M30 65 Q50 80 70 65" stroke="#F97316" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
             thinking: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#8B5CF6" fill-opacity="0.1" stroke="#8B5CF6" stroke-width="2"/><circle cx="35" cy="45" r="4" fill="#8B5CF6"/><circle cx="65" cy="45" r="4" fill="#8B5CF6"/><path d="M40 70 h20" stroke="#8B5CF6" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
-            empty: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#94A3B8" fill-opacity="0.1" stroke="#94A3B8" stroke-width="2"/><circle cx="35" cy="45" r="3" fill="#94A3B8"/><circle cx="65" cy="45" r="3" fill="#94A3B8"/><path d="M35 70 Q50 60 65 70" stroke="#94A3B8" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`
+            empty: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#94A3B8" fill-opacity="0.1" stroke="#94A3B8" stroke-width="2"/><circle cx="35" cy="45" r="3" fill="#94A3B8"/><circle cx="65" cy="45" r="3" fill="#94A3B8"/><path d="M35 70 Q50 60 65 70" stroke="#94A3B8" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+            sad: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#EF4444" fill-opacity="0.1" stroke="#EF4444" stroke-width="2"/><circle cx="35" cy="45" r="4" fill="#EF4444"/><circle cx="65" cy="45" r="4" fill="#EF4444"/><path d="M30 75 Q50 60 70 75" stroke="#EF4444" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`
         };
 
         function setMascot(id, type) {
@@ -1513,12 +1514,6 @@ function save() {
                 currentCard = filteredCards[Math.floor(Math.random() * filteredCards.length)];
                 renderCurrentCardMode();
                 setActionButtonsState(true);
-                // Progress text: kaç kart vadesi gelmiş
-                const dueCount = getDueCards(allFiltered).length;
-                document.getElementById("progressText").textContent =
-                    dueCount > 0
-                        ? `📚 ${dueCount} kart tekrar zamanı geldi (toplam ${allFiltered.length})`
-                        : `✅ Tüm kartlar güncel! (${allFiltered.length} kart)`;
             } else {
                 currentCard = null;
                 document.getElementById("cardFrontWord").textContent = "Kart Yok";
@@ -1617,65 +1612,80 @@ function save() {
                     // 1. Gelişmiş Harf İpucu (Hint) Modülü
                     let revealed = 0;
                     const targetWord = backText;
+                    
+                    const hintDisplay = document.createElement("div");
+                    hintDisplay.style.cssText = "font-size: 20px; font-family: 'Space Mono', monospace; letter-spacing: 2px; margin: 10px 0; min-height: 30px; color: var(--orange);";
+                    
                     const updateHintDisplay = () => {
                         let displayStr = "";
                         for (let i = 0; i < targetWord.length; i++) {
                             const char = targetWord[i];
-                            if (char === " ") displayStr += " &nbsp; ";
-                            else if (i < revealed) displayStr += char + " ";
-                            else displayStr += "_ ";
+                            if (char === " ") {
+                                displayStr += "  ";
+                            } else if (i < revealed) {
+                                displayStr += char;
+                            } else {
+                                displayStr += "_";
+                            }
                         }
-                        return displayStr;
+                        hintDisplay.textContent = displayStr;
                     };
-                    const hintDiv = document.createElement("div");
-                    hintDiv.style.cssText = "font-family:'Space Mono', monospace; color:var(--orange); font-weight:800; font-size:20px; letter-spacing:2px; margin: 10px 0;";
-                    hintDiv.innerHTML = updateHintDisplay();
+                    
                     const hintBtn = document.createElement("button");
-                    hintBtn.className = "action-btn";
-                    hintBtn.style.width = "100%";
-                    hintBtn.style.maxWidth = "280px";
-                    hintBtn.textContent = "💡 Bir Harf Göster";
+                    hintBtn.className = "btn-secondary";
+                    hintBtn.style.cssText = "font-size: 11px; padding: 6px 12px; margin-top: 5px;";
+                    hintBtn.textContent = "💡 Harf İste";
                     hintBtn.onclick = (e) => {
                         e.stopPropagation();
                         if (revealed < targetWord.length) {
                             revealed++;
-                            hintDiv.innerHTML = updateHintDisplay();
-                            if (revealed >= targetWord.length) {
-                                hintBtn.disabled = true;
-                                hintBtn.textContent = "Tümü Gösterildi";
-                            }
+                            updateHintDisplay();
+                        }
+                        if (revealed >= targetWord.length) {
+                            hintBtn.disabled = true;
+                            cardEl.classList.add("flipped");
                         }
                     };
+                    
+                    updateHintDisplay();
                     const wrap = document.createElement("div");
-                    wrap.style.cssText = "display:flex; flex-direction:column; align-items:center; gap:8px;";
-                    wrap.appendChild(hintDiv);
+                    wrap.className = "type-input-area";
+                    wrap.appendChild(hintDisplay);
                     wrap.appendChild(hintBtn);
                     testArea.appendChild(wrap);
                 } else if (activeMode === "mcq") {
-                    const correct = backText;
-                    const pool = appData.cards.filter(c => c.id !== currentCard.id).map(c => isReversed ? c.word : c.meaning);
-                    const options = [correct];
-                    const shuffled = pool.sort(() => Math.random() - 0.5);
-                    for (let p of shuffled) { if (!options.includes(p)) { options.push(p); if (options.length >= 4) break; } }
-                    options.sort(() => Math.random() - 0.5);
-                    options.forEach(opt => {
+                    // Çoktan Seçmeli (MCQ) Modu - Kullanıcı Önerisiyle Güncellendi
+                    const mcqGrid = document.createElement("div");
+                    mcqGrid.style.cssText = "display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; max-width: 340px; margin: 10px auto 0;";
+                    
+                    let pool = appData.cards.filter(c => c.id !== currentCard.id).map(c => isReversed ? c.word : c.meaning);
+                    pool = [...new Set(pool)]; 
+                    pool.sort(() => 0.5 - Math.random());
+                    let choices = pool.slice(0, 3);
+                    choices.push(backText); 
+                    choices.sort(() => 0.5 - Math.random()); 
+                    
+                    choices.forEach(choice => {
                         const btn = document.createElement("button");
-                        btn.className = "action-btn";
-                        btn.style.cssText = "width:100%; margin-top:6px; text-align:left; padding:10px 14px;";
-                        btn.textContent = opt;
+                        btn.className = "btn-secondary";
+                        btn.style.cssText = "text-align: left; padding: 10px 14px; font-size: 13px; font-weight: 600; width: 100%;";
+                        btn.textContent = choice;
                         btn.onclick = (e) => {
                             e.stopPropagation();
-                            if (opt === correct) {
-                                btn.style.background = "var(--green)"; btn.style.color = "white";
-                                showToast("✓ Doğru!", "var(--green)");
+                            if (choice === backText) {
+                                showToast("✓ Doğru Seçenek!", "var(--green)");
                                 cardEl.classList.add("flipped");
+                                handleAnswer("good");
                             } else {
-                                btn.style.background = "var(--red)"; btn.style.color = "white";
-                                showToast("✗ Yanlış!", "var(--red)");
+                                btn.style.borderColor = "var(--red)";
+                                btn.style.background = "rgba(239,68,68,0.05)";
+                                showToast("✗ Yanlış Seçenek!", "var(--red)");
+                                handleAnswer("again");
                             }
                         };
-                        testArea.appendChild(btn);
+                        mcqGrid.appendChild(btn);
                     });
+                    testArea.appendChild(mcqGrid);
                 } else if (activeMode === "verbdrill") {
                     testArea.innerHTML = `
                         <div class="verb-drill-grid">
@@ -1854,10 +1864,6 @@ function save() {
                 updateGlobalStreak();
             }
 
-            appData.stats.totalRepetitions = (appData.stats.totalRepetitions || 0) + 1;
-
-            // Günlük tekrar sayacı + haftalık veri
-            const todayStr = new Date().toDateString();
             if (appData.stats.todayDate !== todayStr) {
                 appData.stats.todayDate = todayStr;
                 appData.stats.todayReps = 0;
@@ -1904,10 +1910,15 @@ function save() {
                 showToast("Geri alınacak hamle yok!", "var(--orange)");
                 return;
             }
-            appData = sessionHistory.pop();
-            save();
-            selectDeck(activeDeckId);
-            showToast("Son hamle geri alındı ↩", "var(--purple)");
+            const previous = sessionHistory.pop();
+            const cardIdx = appData.cards.findIndex(c => c.id === previous.cardId);
+            if (cardIdx !== -1) {
+                appData.cards[cardIdx] = previous.cardState;
+                if (appData.stats.todayReps > 0) appData.stats.todayReps--;
+                save();
+                selectDeck(activeDeckId);
+                showToast("Son hamle geri alındı ↩", "var(--purple)");
+            }
         }
 
         // TEXT TO SPEECH SERVICE - Safari uyumlu
@@ -2005,18 +2016,38 @@ function save() {
                 storyPool = appData.cards.filter(c => selectedStoryDeckIds.includes(c.deckId));
             }
 
+            if (storyPool.length === 0) {
+                showToast("Seçili destelerde kullanılacak kart bulunamadı!", "var(--red)");
+                document.getElementById("storyTextContainer").textContent = "Lütfen önce kart ekleyin veya farklı bir deste seçin.";
+                return;
+            }
+
             const selectedWords = storyPool.slice(0, 8).map(c => c.word).join(", ");
             
-            let prompt = `Hollandaca ${level} seviyesinde ${theme ? theme : 'Günlük Yaşam'} hakkında kısa bir öykü yaz. Yazacağın hikayede şu kelimeleri kullanmaya gayret et ve hikaye metni içinde tam olarak çift asteriks (**kelime**) içine alarak kalın göster: ${selectedWords}. Hikayenin Türkçe çevirisini de yap. Yanıtı SADECE şu JSON şablonunda döndür: {"story":"Hollandaca hikaye metni", "translation":"Hikayenin Türkçe çevirisi"}`;
+            let prompt = `Sen profesyonel bir Hollandaca öğretmenisin. Seviye: ${level}. Tema: ${theme ? theme : 'Günlük Yaşam'}. 
+            Sana verdiğim şu kelimeleri içeren interaktif ve sürükleyici bir hikaye yaz: ${selectedWords}.
+            Kelimeleri hikaye içinde kalın (örn: **kelime**) olarak işaretle.
+            Yanıtı SADECE ve KESİNLİKLE şu JSON formatında döndür, başka hiçbir açıklama satırı ekleme:
+            {"story": "Hollandaca Hikaye Metni", "translation": "Hikayenin Türkçe Çevirisi"}`;
             
             let res = await runGroqAi(prompt);
             try {
-                let parsed = JSON.parse(res);
+                // AI bazen JSON dışı metin eklerse temizle
+                const jsonMatch = res.match(/\{[\s\S]*\}/);
+                const cleanRes = jsonMatch ? jsonMatch[0] : res.replace(/```json|```/g, "").trim();
+                
+                let data = JSON.parse(cleanRes);
                 setMascot("storyMascot", "happy");
-                document.getElementById("storyTextContainer").innerHTML = parsed.story.replace(/\*\*(.*?)\*\*/g, '<span class="story-highlight">$1</span>');
-                document.getElementById("storyTrContainer").textContent = parsed.translation;
+                document.getElementById("storyTextContainer").innerHTML = `
+                    <p style="font-size:15px; line-height:1.6; margin-bottom:12px;">${data.story.replace(/\*\*(.*?)\*\*/g, '<span class="story-highlight">$1</span>')}</p>
+                    <hr style="border:0; border-top:1px dashed var(--border); margin:12px 0;">
+                    <p style="font-size:14px; color:var(--muted); line-height:1.6;">${data.translation}</p>
+                `;
+                document.getElementById("storyTrContainer").textContent = "";
             } catch(e) {
-                document.getElementById("storyTextContainer").textContent = res || "Hikaye başarıyla yüklendi.";
+                console.error("Hikaye Ayrıştırma Hatası:", e);
+                document.getElementById("storyTextContainer").innerHTML = `<p style="font-size:13px; color:var(--red);">Hikaye formatı çözümlenemedi. Yapay zeka yanıtı:</p><pre style="white-space:pre-wrap; font-size:12px;">${res}</pre>`;
+                setMascot("storyMascot", "sad");
             }
         }
 
@@ -2863,22 +2894,33 @@ function save() {
 
         function updateProgress() {
             let currentAreaCount = 0;
+            let pool = [];
             if (activeDeckId === "all") {
-                currentAreaCount = appData.cards.length;
+                pool = appData.cards;
             } else if (activeDeckId === "multi") {
-                currentAreaCount = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId)).length;
+                pool = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId));
             } else {
-                currentAreaCount = appData.cards.filter(c => c.deckId === activeDeckId).length;
+                pool = appData.cards.filter(c => c.deckId === activeDeckId);
             }
+            currentAreaCount = pool.length;
 
             const learnedCount = appData.cards.filter(c => (c.repetitions || 0) > 0).length;
             const progressPercent = appData.cards.length > 0 ? (learnedCount / appData.cards.length) * 100 : 0;
+
+            const dueCount = pool.filter(c => !c.nextReview || c.nextReview <= Date.now()).length;
+            const progressTextEl = document.getElementById("progressText");
+            if (progressTextEl) {
+                if (currentAreaCount > 0) {
+                    progressTextEl.textContent = `Destede Kalan Toplam Kart: ${currentAreaCount} (${dueCount} tekrar bekliyor)`;
+                } else {
+                    progressTextEl.textContent = "Çalışılacak kart kalmadı!";
+                }
+            }
 
             document.getElementById("statsTotalCards").textContent = appData.cards.length;
             document.getElementById("statsLearnedCards").textContent = learnedCount;
             document.getElementById("statsTotalRepetitions").textContent = appData.stats.totalRepetitions;
             document.getElementById("statsTotalErrors").textContent = appData.stats.totalErrors;
-            document.getElementById("progressText").textContent = `Mevcut çalışma alanında toplam ${currentAreaCount} kart aktif`;
             document.getElementById("progressBarFill").style.width = `${progressPercent}%`;
 
             // Günlük hedef güncelle
