@@ -13,48 +13,98 @@
     <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22LinguaPrime%20Ultimate%22%2C%22short_name%22%3A%22LinguaPrime%22%2C%22description%22%3A%22AI%20destekli%20Hollandaca%20%C3%B6%C4%9Frenme%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230A0A0F%22%2C%22theme_color%22%3A%22%230A0A0F%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20192%20192'%3E%3Crect%20width%3D'192'%20height%3D'192'%20rx%3D'40'%20fill%3D'%23F97316'%2F%3E%3Ctext%20x%3D'50%25'%20y%3D'55%25'%20font-size%3D'120'%20text-anchor%3D'middle'%20dominant-baseline%3D'middle'%3E%F0%9F%87%B3%F0%9F%87%B1%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     
     <title>LinguaPrime Ultimate</title>
+    <!-- Premium Grafik Kütüphanesi -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        @import url('https://fonts.cdnfonts.com/css/opendyslexic');
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
         
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         :root {
-            --bg: #08080C; --surface: rgba(24, 24, 30, 0.7); --surface2: rgba(42, 42, 54, 0.6); --surface3: rgba(60, 60, 75, 0.5);
-            --border: rgba(255,255,255,0.1); --text: #F8FAFC; --muted: #94A3B8; --subtle: #CBD5E1;
+            --bg: #0A0A0F; --surface: rgba(20, 20, 24, 0.7); --surface2: rgba(30, 30, 38, 0.8); --surface3: rgba(42, 42, 54, 0.8);
+            --border: rgba(255,255,255,0.1); --text: #F8FAFC; --muted: #94A3B8; --subtle: #64748B;
             --orange: #F97316; --green: #22C55E; --red: #EF4444; --blue: #3B82F6; --purple: #8B5CF6;
-            --card-bg: rgba(22, 22, 28, 0.85); --radius: 28px; --font: 'DM Sans', system-ui, sans-serif;
-            --glass: blur(16px) saturate(180%);
+            --card-bg: rgba(255, 255, 255, 0.06); --radius: 32px; --font: 'DM Sans', system-ui, sans-serif;
         }
         
+        body.oled {
+            --bg: #000000; --surface: #0a0a0a; --surface2: #121212; --surface3: #1a1a1a;
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+
         body.light {
-            --bg: #F8FAFC; --surface: rgba(255, 255, 255, 0.75); --surface2: rgba(241, 245, 249, 0.8); --surface3: rgba(226, 232, 240, 0.8);
-            --border: rgba(0,0,0,0.06); --text: #0F172A; --muted: #64748B; --subtle: #475569;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --glass: blur(12px) saturate(150%);
+            --bg: #F5F5F7; 
+            --surface: rgba(255, 255, 255, 0.88); 
+            --surface2: #FFFFFF; 
+            --surface3: #E5E5EA;
+            --border: rgba(0, 0, 0, 0.12); 
+            --text: #1D1D1F;       /* Net, jilet gibi Apple siyahı */
+            --muted: #48484A;      /* Okunabilirliği artırılmış koyu gri */
+            --subtle: #68686E;     /* Pasif ikonlar için ideal kontrast */
+            --card-bg: #FFFFFF;
+        }
+
+        /* Işık modunda alt navigasyon ve klavye kısayollarının net okunması için ek koruma */
+        body.light .action-btn {
+            background: #FFFFFF !important;
+            color: #1D1D1F !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+        body.light .kbd {
+            background: #D1D1D6 !important;
+            color: #1D1D1F !important;
+            font-weight: 700;
         }
         
-        html, body { 
-            height: 100%;
-            height: 100dvh; 
-            margin: 0; padding: 0; 
-            overflow: hidden; 
-            overscroll-behavior: none;
-            font-family: var(--font); background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s;
+        body { font-family: var(--font); background: var(--bg); background-attachment: fixed; color: var(--text); height: 100vh; height: 100dvh; overflow: hidden; transition: background 0.3s, color 0.3s; }
+        
+        /* LIGHT MODE CONTEXTUAL OVERRIDES */
+        body.light .sidebar { background: rgba(245, 245, 247, 0.9); }
+        body.light .modal { background: rgba(255, 255, 255, 0.95); }
+        body.light .chat-area-box, body.light .table-container { background: #FFFFFF; }
+        body.light .ambient-glow { opacity: 0.04; }
+        body.light .action-btn { background: #FFFFFF; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        body.light .action-btn:active { background: #F0F0F3; }
+        body.light .kbd { background: #E5E5E7; color: var(--muted); }
+
+        /* iOS Safari full screen support */
+        body.dyslexic { --font: 'OpenDyslexic', sans-serif !important; }
+        body.dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
+
+        body.modal-open .main { filter: blur(8px); opacity: 0.2; pointer-events: none; transition: all 0.4s; }
+        @supports (-webkit-touch-callout: none) {
+            body { height: -webkit-fill-available; }
         }
-        @supports (-webkit-touch-callout: none) { html, body { height: -webkit-fill-available; } }
-        /* iOS Safari tam ekran desteği */
+        button, .action-btn, .mode-btn, .sidebar-item { touch-action: manipulation; }
         button, input, select, textarea { font-family: var(--font); }
         
+        /* AMBIENT GLOW SYSTEM */
+        .ambient-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85vw;
+            height: 70vh;
+            background: var(--orange);
+            filter: blur(120px);
+            opacity: 0.08;
+            z-index: -1;
+            transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
         /* TOP BAR */
-        .menu-btn { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 16px; z-index: 1100; width: 48px; height: 48px; border-radius: 16px; background: var(--surface); backdrop-filter: var(--glass); border: 1px solid var(--border); color: var(--text); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .menu-btn { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 16px; z-index: 1100; width: 46px; height: 46px; border-radius: 16px; background: var(--surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); color: var(--text); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .menu-btn:active { transform: scale(0.93); }
-        .quick-add-btn { position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 16px; z-index: 1100; width: 48px; height: 48px; border-radius: 16px; background: var(--orange); border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 8px 24px rgba(249,115,22,0.25); }
+        .quick-add-btn { position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 16px; z-index: 1100; width: 46px; height: 46px; border-radius: 16px; background: var(--orange); border: none; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 8px 24px rgba(249,115,22,0.3); }
         .quick-add-btn:active { transform: scale(0.93); }
-        .streak-badge { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 76px; z-index: 1100; height: 48px; padding: 0 16px; border-radius: 16px; background: var(--surface); backdrop-filter: var(--glass); border: 1px solid var(--border); color: #FFA500; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .streak-badge { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 72px; z-index: 1100; height: 46px; padding: 0 16px; border-radius: 16px; background: var(--surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,165,0,0.2); color: #FFA500; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: transform 0.15s; text-shadow: 0 0 12px rgba(255,165,0,0.3); }
         .streak-badge:active { transform: scale(0.96); }
         
         /* SIDEBAR */
-        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 310px; height: 100vh; height: 100dvh; background: var(--card-bg); backdrop-filter: var(--glass); border-right: 1px solid var(--border); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1300; display: flex; flex-direction: column; padding-top: calc(16px + env(safe-area-inset-top)); overflow: hidden; }
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 295px; height: 100vh; height: 100dvh; background: rgba(10, 10, 15, 0.9); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-right: 1px solid var(--border); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1300; display: flex; flex-direction: column; padding-top: calc(16px + env(safe-area-inset-top)); overflow: hidden; -webkit-overflow-scrolling: touch; }
         @supports (-webkit-touch-callout: none) {
             .sidebar { height: -webkit-fill-available; }
         }
@@ -77,36 +127,96 @@
         /* sidebar iOS fix handled separately */
         
         /* MAIN AREA */
-        .main { height: 100%; height: -webkit-fill-available; display: flex; flex-direction: column; overflow: auto; padding-top: calc(70px + env(safe-area-inset-top)); }
-        .card-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 20px 4px; position: relative; min-height: 0; }
-        .card-container { width: 100%; max-width: 560px; -webkit-perspective: 1400px; perspective: 1400px; }
-        .card { width: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; border-radius: var(--radius); }
+        .main { height: 100%; height: -webkit-fill-available; display: flex; flex-direction: column; overflow: hidden; padding-top: calc(70px + env(safe-area-inset-top)); }
+        .card-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 16px 4px; position: relative; min-height: 0; -webkit-perspective: 2000px; perspective: 2000px; }
+        .card-container { width: 100%; max-width: 560px; -webkit-perspective: 1400px; perspective: 1400px; overflow: visible; }
+        .card { width: 100%; position: relative; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; -webkit-transition: -webkit-transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; border-radius: var(--radius); will-change: transform; }
         .card.flipped { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
-        .card-face { -webkit-backface-visibility: hidden; backface-visibility: hidden; background: var(--card-bg); backdrop-filter: var(--glass); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 32px; min-height: clamp(250px, 45vh, 420px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        @media (max-width: 680px) {
-            .card-area { justify-content: flex-start; padding: 24px 16px calc(130px + env(safe-area-inset-bottom)); }
-            .card-face { min-height: clamp(220px, 38vh, 360px); }
+        .card-face { 
+            -webkit-backface-visibility: hidden; 
+            backface-visibility: hidden; 
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius); 
+            padding: 32px 24px; 
+            min-height: clamp(220px, 42vh, 380px); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
+            position: relative; 
+            box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+            overflow: hidden;
+            /* Safari 3D derinlik sabitleme */
+            -webkit-transform: translateZ(0); transform: translateZ(0);
         }
         body.light .card-face { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
-        .card-front { -webkit-transform: rotateY(0deg) translateZ(1px); transform: rotateY(0deg) translateZ(1px); }
-        .card-back { -webkit-transform: rotateY(180deg) translateZ(1px); transform: rotateY(180deg) translateZ(1px); position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; }
-        .word { font-size: clamp(28px, 6vw, 40px); font-weight: 800; margin: 16px 0; line-height: 1.2; letter-spacing: -0.02em; }
-        .meaning { font-size: clamp(20px, 4vw, 24px); font-weight: 600; color: var(--orange); margin: 10px 0; }
-        .sentence { font-size: 14px; color: var(--subtle); font-style: italic; margin-top: 10px; max-width: 90%; }
+        .card-front { z-index: 2; }
+        .card-back { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; z-index: 1; }
+        
+        /* Çevrildiğinde katman sırasını Safari için zorla */
+        .card.flipped .card-back { z-index: 2; -webkit-transform: rotateY(180deg) translateZ(1px); }
+        .card.flipped .card-front { z-index: 1; -webkit-transform: rotateY(0deg) translateZ(-1px); }
+
+        /* CAM PARLAMA (REFLECTION) EFEKTİ */
+        .card-face::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 150%;
+            height: 100%;
+            background: linear-gradient(
+                110deg,
+                transparent 45%,
+                rgba(255, 255, 255, 0.35) 50%,
+                transparent 55%
+            );
+            transform: skewX(-25deg);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Kart çevrildiğinde animasyonu tetikle */
+        .card.flipped .card-back::after,
+        .card:not(.flipped) .card-front::after {
+            animation: shine 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes shine {
+            0% { left: -150%; }
+            100% { left: 150%; }
+        }
+
+        /* Kart geri dönerken kullanılacak esnek animasyon */
+        .card.snapping { transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; }
+
+        /* ÖĞRENME SEVİYESİ (MASTERY) BAR */
+        .learning-level-container { display: flex; align-items: center; gap: 6px; margin-top: 10px; opacity: 0.8; }
+        .learning-level-label { font-size: 9px; color: var(--subtle); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .learning-level-bar { width: 60px; height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+        .learning-level-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--green)); width: 0%; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        .word { font-size: 34px; font-weight: 800; margin: 12px 0; line-height: 1.15; letter-spacing: -1px; }
+        .meaning { font-size: 22px; font-weight: 700; color: var(--orange); margin: 8px 0; letter-spacing: -0.4px; }
+        .sentence { font-size: 15px; color: var(--muted); font-style: italic; margin-top: 10px; max-width: 85%; line-height: 1.4; }
+        .card-story-box { margin-top: 12px; max-width: 88%; padding: 10px 12px; border-radius: 14px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.18); font-size: 12px; color: var(--muted); line-height: 1.45; text-align: left; display: none; }
+        .card-story-title { display: block; color: var(--purple); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .card-story-text { color: var(--text); margin-bottom: 6px; }
+        .card-story-translation { color: var(--muted); font-style: italic; }
         .badge { background: var(--surface2); padding: 4px 12px; border-radius: 24px; font-size: 11px; color: var(--subtle); font-weight: 600; text-transform: uppercase; }
         .swipe-icon { position: absolute; top: 20px; font-size: 32px; font-weight: bold; opacity: 0; transition: opacity 0.1s; pointer-events: none; z-index: 15; }
         .swipe-icon.right { right: 18px; color: var(--green); }
         .swipe-icon.left { left: 18px; color: var(--red); }
         
         /* ACTION BAR */
-        .action-bar { display: flex; gap: 10px; padding: 16px 20px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); max-width: 600px; margin: 0 auto; width: 100%; flex-shrink: 0; }
-        .action-btn { flex: 1; padding: 14px 6px; border-radius: 30px; background: var(--surface); border: none; color: var(--text); font-weight: 700; cursor: pointer; transition: transform 0.12s, background 0.15s; font-size: 12px; }
-        .action-btn:active { transform: scale(0.94); background: var(--surface3); }
-        .action-btn.again { border-left: 4px solid var(--red); }
-        .action-btn.hard { border-left: 4px solid var(--orange); }
-        .action-btn.good { border-left: 4px solid var(--green); }
-        .action-btn.easy { border-left: 4px solid var(--blue); }
-        .action-btn.undo-btn { border-left: 4px solid var(--purple); flex: 0.55; }
+        .action-bar { display: flex; gap: 10px; padding: 16px 20px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); max-width: 560px; margin: 0 auto; width: 100%; flex-shrink: 0; }
+        .action-btn { flex: 1; padding: 16px 6px; border-radius: 20px; background: var(--surface); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--border); color: var(--text); font-weight: 800; cursor: pointer; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 12px; }
+        .action-btn:active { transform: scale(0.93); }
+        .action-btn.again { border-bottom: 3px solid var(--red); }
+        .action-btn.hard { border-bottom: 3px solid var(--orange); }
+        .action-btn.good { border-bottom: 3px solid var(--green); }
+        .action-btn.easy { border-bottom: 3px solid var(--blue); }
+        .action-btn.undo-btn { border-bottom: 3px solid var(--purple); flex: 0.6; }
         .action-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
 
         /* ÇIFT YÖN & YAZARAK ÖĞRENME */
@@ -132,14 +242,7 @@
         .deck-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; display: inline-block; margin-right: 4px; }
 
         /* KLAVYE KİSAYOL BADGE */
-        .kbd-info-box { text-align: center; padding: 6px 14px; flex-shrink: 0; background: var(--surface); backdrop-filter: var(--glass); margin: 0 auto 10px; border-radius: 12px; border: 1px solid var(--border); display: none; }
-        @media (min-width: 1024px) { .kbd-info-box { display: block; } } /* Sadece Mac/Bilgisayar ekranlarında göster */
-        .kbd-info-box span { font-size: 11px; color: var(--subtle); font-weight: 600; display: flex; gap: 12px; justify-content: center; align-items: center; }
-        .kbd { 
-            display: inline-block; background: var(--surface3); border: 1px solid var(--border); 
-            border-radius: 5px; padding: 2px 6px; font-size: 10px; font-family: 'Space Mono', monospace; 
-            color: var(--orange); box-shadow: 0 2px 0 var(--border); margin-right: 4px;
-        }
+        .kbd { display: inline-block; background: var(--surface3); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; font-size: 10px; font-family: 'Space Mono', monospace; color: var(--subtle); margin-left: 4px; }
         
         /* MODE SELECTOR */
         .mode-selector { display: flex; gap: 6px; justify-content: center; padding: 6px 10px 0; flex-wrap: wrap; flex-shrink: 0; }
@@ -154,17 +257,27 @@
         .progress-text { text-align: center; color: var(--subtle); font-size: 11px; font-weight: 600; }
         
         /* MODALS */
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--surface); border-radius: var(--radius); padding: 24px; width: 94%; max-width: 580px; z-index: 1400; display: none; flex-direction: column; gap: 14px; border: 1px solid var(--border); max-height: 90vh; max-height: 90dvh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.5); -webkit-overflow-scrolling: touch; transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -45%); background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); border-radius: var(--radius); padding: 32px 24px; width: 92%; max-width: 520px; z-index: 1400; display: none; flex-direction: column; gap: 18px; border: 1px solid var(--border); max-height: 85vh; max-height: 85dvh; overflow-y: auto; box-shadow: 0 40px 100px rgba(0,0,0,0.6); -webkit-overflow-scrolling: touch; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal.open { display: flex; }
-        @media (min-width: 768px) { .modal { max-width: 880px; padding: 32px; } }
         
-        /* ODAK MODU (FULLSCREEN) STİLLERİ */
-        .modal.fullscreen { width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; top: 0; left: 0; transform: none; border-radius: 0; z-index: 2000; padding-top: calc(20px + env(safe-area-inset-top)); }
-        .focus-toggle-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; padding: 4px; transition: color 0.2s; display: flex; align-items: center; justify-content: center; }
-        .focus-toggle-btn:hover { color: var(--orange); }
+        /* TAM SAYFA (FULL SCREEN) MODAL DESTEĞİ */
+        .modal.full-screen {
+            width: 100% !important;
+            height: 100% !important;
+            height: 100dvh !important;
+            max-width: none !important;
+            max-height: none !important;
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+            border-radius: 0 !important;
+            border: none !important;
+            padding-top: calc(20px + env(safe-area-inset-top));
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
 
         .modal h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
-        .modal input, .modal select, .modal textarea { background: var(--surface2); border: 1px solid var(--surface3); padding: 12px 14px; border-radius: 14px; color: var(--text); font-size: 14px; width: 100%; transition: border-color 0.2s; }
+        .modal input, .modal select, .modal textarea { background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 14px 16px; border-radius: 18px; color: var(--text); font-size: 14px; width: 100%; transition: all 0.2s; }
         .modal input:focus, .modal select:focus, .modal textarea:focus { outline: none; border-color: var(--orange); }
         .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
         
@@ -184,6 +297,24 @@
         .search-input { background: var(--surface2); border: 1px solid var(--surface3); padding: 10px 14px; border-radius: 12px; color: var(--text); font-size: 13px; }
         .tts-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 12px; color: var(--text); cursor: pointer; font-size: 12px; }
         .tts-btn:hover { background: var(--surface3); }
+
+        /* SKELETON LOADERS & SHIMMER EFFECT */
+        .skeleton-loader {
+            display: flex; flex-direction: column; gap: 12px; width: 100%;
+        }
+        .skeleton-item {
+            height: 16px; width: 100%; border-radius: 4px;
+            background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .mascot-container {
+            width: 120px; height: 120px; margin: 0 auto 16px; opacity: 0.9;
+        }
         
         /* AI MODULE REUSABLES */
         .ai-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 14px; background: linear-gradient(135deg, #7C3AED, #4F46E5); border: none; color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: transform 0.12s; }
@@ -192,8 +323,20 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         
         /* REPEATING MODAL UI CONSTRUCTS */
-        .chat-area-box { background: var(--surface2); border-radius: 16px; padding: 12px; height: 50vh; min-height: 350px; max-height: 650px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
+        .chat-area-box { background: var(--surface2); border-radius: 16px; padding: 12px; height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); -webkit-overflow-scrolling: touch; transition: height 0.3s; }
         
+        /* Tam sayfa modallarda içerik alanlarının genişlemesi */
+        .modal.full-screen .chat-area-box,
+        .modal.full-screen #storyOutput,
+        .modal.full-screen #aiDictResult,
+        .modal.full-screen #lyricsResult,
+        .modal.full-screen #newsFeedBox,
+        .modal.full-screen #podcastOutput {
+            flex: 1 !important;
+            max-height: none !important;
+            height: auto !important;
+        }
+
         /* COPIED CSS OVERLAYS FROM DATA CORPUS */
         .chat-msg { max-width: 78%; padding: 9px 13px; border-radius: 18px; font-size: 13px; line-height: 1.55; }
         .chat-msg.bot { background: var(--surface3); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
@@ -224,7 +367,7 @@
         .grammar-opt-btn { padding: 9px 18px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 600; }
         
         /* TOAST & SYSTEM */
-        #toast { position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%) translateY(-200px); padding: 12px 24px; border-radius: 20px; font-weight: 700; z-index: 3000; transition: transform 0.3s cubic-bezier(.175, .885, .32, 1.275); color: white; box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-size: 13px; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
+        #toast { position: fixed; top: calc(24px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%) translateY(-200px); padding: 14px 28px; border-radius: 24px; font-weight: 800; z-index: 3000; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: white; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 12px 32px rgba(0,0,0,0.4); font-size: 14px; white-space: nowrap; max-width: 90vw; }
         #toast.show { transform: translateX(-50%) translateY(0); }
         .confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
         
@@ -238,8 +381,15 @@
         .stat-card.red .stat-number { color: var(--red); }
         .stat-card.purple .stat-number { color: var(--purple); }
         
+        /* CHART STYLING */
+        #statsChart {
+            width: 100% !important;
+            height: 180px !important;
+            margin-top: 10px;
+        }
+
         /* CORRECTION & WEAKNESS BUILDERS */
-        .correction-box, .weakness-item { background: var(--surface2); border-radius: 14px; padding: 14px; margin-top: 8px; border: 1px solid var(--border); }
+        .correction-box, .weakness-item { background: var(--surface2); border-radius: 14px; padding: 14px; margin-top: 8px; border: 1px solid var(--border); position: relative; }
         .weakness-item { border-left: 4px solid var(--red); }
         .story-highlight { background: rgba(249,115,22, 0.2); color: var(--orange); border-radius: 4px; padding: 1px 4px; font-weight: 700; }
         
@@ -289,15 +439,10 @@
         .pwa-banner-btn { background: var(--orange); color: #0A0A0F; border: none; padding: 8px 14px; border-radius: 13px; font-weight: 700; font-size: 12px; cursor: pointer; white-space: nowrap; transition: transform 0.1s; }
         .pwa-banner-btn:active { transform: scale(0.95); }
         .pwa-banner-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px; }
-
-        /* AI Multimedia Context Styles */
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .ai-context-box { width: 100%; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
-        .ai-label { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block; }
     </style>
 </head>
 <body>
+    <div class="ambient-glow" id="ambientGlow"></div>
     <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
     <div id="toast">Sistem Bildirimi</div>
 
@@ -305,9 +450,11 @@
     <div class="groq-setup" id="groqSetupScreen" style="display: none;">
         <div class="groq-setup-icon">🧠</div>
         <div class="groq-setup-title">LinguaPrime AI Kurulumu</div>
-        <div class="groq-setup-desc">Uygulamanın tüm gelişmiş yapay zeka özelliklerini (Akıllı Hikayeler, Canlı Sohbetbotu, Aksan Analizi) aktifleştirmek için Groq API anahtarınızı girin. Yerel cihazınızda güvenle saklanır.</div>
-        <input type="password" class="search-input" id="groqKeyInput" placeholder="gsk_xxxxxxxxxxxx..." style="width: 100%; max-width: 360px; text-align: center; margin-bottom: 12px; font-size: 14px;">
-        <button class="btn-primary" id="saveGroqKeyBtn">Anahtarı Kaydet & Başla</button>
+        <div class="groq-setup-desc" id="groqSetupDesc">API anahtarınızı şifrelemek için bir <b>Master Şifre</b> belirleyin. Bu şifre kaydedilmez, her oturumda anahtarı çözmek için istenir.</div>
+        <input type="password" class="search-input" id="groqKeyInput" placeholder="Groq API Key (gsk_...)" style="width: 100%; max-width: 360px; text-align: center; margin-bottom: 8px; font-size: 14px;">
+        <input type="password" class="search-input" id="masterPasswordInput" placeholder="Master Şifre" style="width: 100%; max-width: 360px; text-align: center; margin-bottom: 12px; font-size: 14px;">
+        <button class="btn-primary" id="saveGroqKeyBtn" style="width: 100%; max-width: 360px;">🔐 Şifrele ve Kaydet</button>
+        <button class="btn-primary" id="unlockGroqBtn" style="width: 100%; max-width: 360px; display: none; margin-top: 8px;">🔓 Anahtarı Çöz</button>
         <div class="groq-setup-hint" style="font-size: 11px; margin-top: 10px; color: var(--muted);">Anahtarınız yoksa <a href="https://console.groq.com/" target="_blank" style="color:var(--orange);">groq.com</a> adresinden ücretsiz alabilirsiniz.</div>
     </div>
 
@@ -366,6 +513,17 @@
             <div class="sidebar-item" id="statsBtn">📊 İlerleme & Analitik Dashboard</div>
             <div class="sidebar-item" id="settingsBtn">⚙️ Gelişmiş Ayarlar & Veri Güvenliği</div>
         </div>
+        
+        <div class="sidebar-item" style="border-top: 1px solid var(--border); margin-top: auto;">
+            <label class="switch" style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+                <input type="checkbox" id="dyslexicToggle" style="width:16px; height:16px;"> 📖 Disleksi Modu
+            </label>
+        </div>
+    </div>
+
+    <!-- FOCUS MODE OVERLAY -->
+    <div id="focusOverlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1350; display:none; backdrop-filter:blur(10px);">
+        <div style="position:absolute; top:20px; width:100%; text-align:center; color:var(--orange); font-weight:800; font-size:12px; letter-spacing:2px;">ODAKLANMA MODU AKTİF</div>
     </div>
 
     <!-- CORE LEARNING AREA FRAMEWORK -->
@@ -387,14 +545,6 @@
             <button class="direction-btn" id="dirRandom" title="Rastgele yön">🔀 Rastgele</button>
         </div>
 
-        <!-- OTURUM ÖZETİ (Eksik ID'ler buraya eklendi) -->
-        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px; font-size: 11px; font-weight: 700;">
-            <span style="color: var(--blue);">YENİ: <span id="newCount">0</span></span>
-            <span style="color: var(--red);">TEKRAR: <span id="dueCount">0</span></span>
-            <span style="color: var(--purple);">OTURUM: <span id="sessionCount">0</span></span>
-            <span style="color: var(--green);">TOPLAM: <span id="totalCount">0</span></span>
-        </div>
-
         <div class="progress-bar-container">
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBarFill"></div></div>
             <div class="progress-text" id="progressText">Bugün 0/0 kart tamamlandı</div>
@@ -410,47 +560,42 @@
                         <div class="badge" id="cardDeckBadge">Genel</div>
                         <div class="word" id="cardFrontWord">Uygulamaya Başlayın</div>
                         <button class="tts-btn" id="frontTTSBtn">🔊 Telaffuz (NL)</button>
+                        <div class="learning-level-container">
+                            <span class="learning-level-label">Öğrenme</span>
+                            <div class="learning-level-bar"><div class="learning-level-fill"></div></div>
+                        </div>
                         <div id="testArea" style="width: 100%; margin-top: 15px;"></div>
                     </div>
                     <!-- Back face -->
                     <div class="card-face card-back">
                         <div class="meaning" id="cardBackMeaning">Deste Seçin veya Kart Ekleyin</div>
                         <div class="sentence" id="cardBackSentence">Örnek cümle burada görünecektir.</div>
-                        
-                        <!-- Yapay Zeka Dinamik Bağlam Alanı -->
-                        <div id="ai-multimedia-context" class="ai-context-box">
-                            <div style="display:flex; align-items:start; gap:8px;">
-                                <span class="ai-label" style="background:var(--purple); color:white;">Dilbilgisi</span>
-                                <p id="ai-grammar" style="font-size:12px; color:var(--subtle); font-style:italic;">Kartı çevirince analiz edilir...</p>
-                            </div>
-                            <div style="background:var(--surface2); padding:8px; border-radius:10px; border-left:3px solid var(--blue);">
-                                <span class="ai-label" style="color:var(--blue); padding:0; margin-bottom:2px;">Bağlamsal Öykü (Bilingual)</span>
-                                <p id="ai-story" style="font-size:12px; color:var(--text); line-height:1.4;"></p>
-                            </div>
-                            <div style="background:rgba(245,158,11,0.1); padding:8px; border-radius:10px; border-left:3px solid var(--orange); display:flex; gap:8px; align-items:center;">
-                                <div style="font-size:18px;">🎬</div>
-                                <div>
-                                    <span class="ai-label" style="color:var(--orange); padding:0;">Dizi/Film Sahnesi Tasviri</span>
-                                    <p id="ai-media-scene" style="font-size:11px; color:var(--subtle);"></p>
-                                </div>
-                            </div>
+                        <div class="card-story-box" id="cardBackStory">
+                            <span class="card-story-title">Mini Hikaye</span>
+                            <div class="card-story-text" id="cardBackStoryText"></div>
+                            <div class="card-story-translation" id="cardBackStoryTranslation"></div>
                         </div>
-
+                        <div id="cardMnemonic" style="margin-top:12px; font-size:12px; color:var(--purple); font-style:italic; border-top:1px dashed var(--border); padding-top:8px; display:none;"></div>
                         <button class="tts-btn" id="backTTSBtn">🔊 Anlamı Oku (TR)</button>
+                        <button class="tts-btn" id="generateCardStoryBtn">✨ Mini Hikaye Üret</button>
                         <div id="cardAccuracyBadge" style="margin-top:10px; font-size:11px; color:var(--subtle); font-weight:600;"></div>
+                        <div class="learning-level-container">
+                            <span class="learning-level-label">Ustalık</span>
+                            <div class="learning-level-bar"><div class="learning-level-fill"></div></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="kbd-info-box">
-            <span>
-                <label><span class="kbd">Space</span> Çevir</label>
-                <label><span class="kbd">1</span> Tekrar</label>
-                <label><span class="kbd">2</span> Zor</label>
-                <label><span class="kbd">3</span> İyi</label>
-                <label><span class="kbd">4</span> Kolay</label>
-                <label><span class="kbd">Z</span> Geri Al</label>
+        <div style="text-align:center; padding: 2px 14px 0; flex-shrink:0;">
+            <span style="font-size:10px; color:var(--muted);">
+                <span class="kbd" aria-label="Klavye Kısayolu: Boşluk Tuşu">Space</span> Çevir &nbsp;
+                <span class="kbd" aria-label="Klavye Kısayolu: 1">1</span>Tekrar &nbsp;
+                <span class="kbd" aria-label="Klavye Kısayolu: 2">2</span>Zor &nbsp;
+                <span class="kbd" aria-label="Klavye Kısayolu: 3">3</span>İyi &nbsp;
+                <span class="kbd" aria-label="Klavye Kısayolu: 4">4</span>Kolay &nbsp;
+                <span class="kbd" aria-label="Klavye Kısayolu: Z">Z</span>Geri Al
             </span>
         </div>
 
@@ -488,7 +633,7 @@
     </div>
 
     <!-- 2. CARD MANAGEMENT PANEL -->
-    <div class="modal" id="manageCardsModal" style="max-width: 950px;">
+    <div class="modal" id="manageCardsModal" style="max-width: 720px;">
         <h3>📋 Kart Yönetim Paneli</h3>
         <div style="display: flex; gap: 8px;">
             <input type="text" class="search-input" id="cardManageSearch" placeholder="Kartlarda veya anlamlarda ara...">
@@ -522,11 +667,9 @@
     </div>
 
     <!-- 3. AI STORY ENGINE MODAL -->
-    <div class="modal" id="storyModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📖 AI İnteraktif Hikaye Üretici</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('storyModal')" title="Odak Modu">⛶</button>
-        </div>
+    <div class="modal full-screen" id="storyModal">
+        <h3>📖 AI İnteraktif Hikaye Üretici</h3>
+        <div class="mascot-container" id="storyMascot"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <select id="storyLevel">
                 <option value="A1">A1 Seviye</option>
@@ -546,7 +689,7 @@
             <div id="storyDeckSelectorZone" style="display: flex; flex-direction: column; gap: 6px; max-height: 110px; overflow-y: auto; padding: 4px; background: var(--surface2); border-radius: 12px;"></div>
         </div>
         <button class="ai-btn" id="generateStoryBtn" style="width: 100%; justify-content: center;">✨ Hikaye Yaz ve Çevir</button>
-        <div class="correction-box" id="storyOutput" style="display: none; max-height: 60vh; overflow-y: auto;">
+        <div class="correction-box" id="storyOutput" style="display: none; overflow-y: auto;">
             <div id="storyTextContainer" style="font-size:14px; line-height:1.6;"></div>
             <hr style="margin:8px 0; opacity:0.1;">
             <div id="storyTrContainer" style="font-size:13px; color:var(--subtle);"></div>
@@ -556,10 +699,7 @@
 
     <!-- 4. SENTENCE CORRECTOR MODAL -->
     <div class="modal" id="correctModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>✍ AI Akıllı Cümle Düzeltici</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('correctModal')" title="Odak Modu">⛶</button>
-        </div>
+        <h3>✍ AI Akıllı Cümle Düzeltici</h3>
         <textarea id="correctionInput" placeholder="Hollandaca kurduğunuz bir cümleyi yazın..." rows="3"></textarea>
         <button class="ai-btn" id="checkCorrectionBtn" style="width: 100%; justify-content: center;">🔍 Cümle Analizi Yap</button>
         <div class="correction-box" id="correctionResult" style="display: none;"></div>
@@ -574,7 +714,7 @@
     </div>
 
     <!-- 6. AI DICTIONARY & COMPOSER MODAL -->
-    <div class="modal" id="aiDictModal">
+    <div class="modal full-screen" id="aiDictModal">
         <h3>🔤 AI Sözlük & Kart Üretici</h3>
         <input type="text" id="aiDictQuery" placeholder="Aramak istediğiniz Hollandaca kelime...">
         <button class="ai-btn" id="searchAiDictBtn" style="width: 100%; justify-content: center;">🤖 Akıllı Analiz ve Kart Yap</button>
@@ -583,10 +723,15 @@
     </div>
 
     <!-- 7. LIVE AI CHAT MENTOR MODAL -->
-    <div class="modal" id="chatModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>💬 AI Canlı Mentor Sohbeti</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('chatModal')" title="Odak Modu">⛶</button>
+    <div class="modal full-screen" id="chatModal">
+        <h3>💬 AI Canlı Mentor Sohbeti</h3>
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <select id="chatPersona" style="font-size:12px; padding:6px;">
+                <option value="friendly">😊 Neşeli Dil Partneri (A1-B1)</option>
+                <option value="strict">👨‍🏫 Sert Gramer Hocası (B2+)</option>
+                <option value="landlord">🏠 Huurbaas (Sert Ev Sahibi Simülasyonu)</option>
+                <option value="official">🏢 Belediye Memuru (Resmi Dil)</option>
+            </select>
         </div>
         <div class="chat-area-box" id="chatMessages"></div>
         <div style="display: flex; gap: 6px;">
@@ -597,7 +742,7 @@
     </div>
 
     <!-- 8. PODCAST STATION MODAL -->
-    <div class="modal" id="podcastModal">
+    <div class="modal full-screen" id="podcastModal">
         <h3>🎙 AI Kişisel Podcast İstasyonu</h3>
         <button class="ai-btn" id="generatePodcastBtn" style="width:100%; justify-content:center;">🎧 Günlük Dinleme Dosyası Hazırla</button>
         <div class="correction-box" id="podcastOutput" style="display:none; text-align:center;">
@@ -609,11 +754,8 @@
     </div>
 
     <!-- 9. CULTURE SHOCK RPG MODAL -->
-    <div class="modal" id="rpgModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>🎭 Kültür Şoku RPG Simülatörü</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('rpgModal')" title="Odak Modu">⛶</button>
-        </div>
+    <div class="modal full-screen" id="rpgModal">
+        <h3>🎭 Kültür Şoku RPG Simülatörü</h3>
         <div id="rpgCqDisplay" style="font-size: 14px; font-weight: 700; color: var(--orange); margin-bottom: 8px;">Kültürel IQ: 50</div>
         <div class="chat-area-box" id="rpgMessages"></div>
         <div style="display: flex; gap: 6px; flex-direction:column;">
@@ -625,10 +767,15 @@
     </div>
 
     <!-- 10. WHATSAPP SIMULATOR MODAL -->
-    <div class="modal" id="whatsappModal">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📱 WhatsApp Dil Simülatörü</h3>
-            <button class="focus-toggle-btn" onclick="toggleModalFocus('whatsappModal')" title="Odak Modu">⛶</button>
+    <div class="modal full-screen" id="whatsappModal">
+        <h3>📱 WhatsApp Dil Simülatörü</h3>
+        <div style="padding-bottom:10px;">
+            <select id="waPersona" style="width:100%; font-size:12px; background:var(--surface3); border:none; color:white; border-radius:8px;">
+                <option value="friend">Sophie (Arkadaş)</option>
+                <option value="boss">Meneer de Vries (Patron)</option>
+                <option value="delivery">Bezorgdienst (Kurye - Paket Sorunu)</option>
+                <option value="neighbor">De Buurman (Gürültücü Komşu)</option>
+            </select>
         </div>
         <div class="chat-area-box" id="waMessages" style="background: #0b141a; border: none;"></div>
         <div style="display: flex; gap: 6px;">
@@ -675,10 +822,10 @@
     </div>
 
     <!-- 15. NEWS ACCORDION FEED MODAL -->
-    <div class="modal" id="newsModal">
+    <div class="modal full-screen" id="newsModal">
         <h3>📰 Günlük Haber Akışı & Analizi</h3>
         <button class="ai-btn" id="generateNewsBtn" style="width:100%; justify-content:center;">🌐 Haberleri Çek & Seviyelendir</button>
-        <div id="newsFeedBox" style="display:flex; flex-direction:column; gap:10px; margin-top:10px; max-height:300px; overflow-y:auto;"></div>
+        <div id="newsFeedBox" style="display:flex; flex-direction:column; gap:10px; margin-top:10px; overflow-y:auto;"></div>
         <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('newsModal')">Kapat</button></div>
     </div>
 
@@ -698,11 +845,11 @@
     </div>
 
     <!-- 17. MUSIC & LYRICS ANALYSIS MODAL -->
-    <div class="modal" id="lyricsModal">
+    <div class="modal full-screen" id="lyricsModal">
         <h3>🎵 Şarkı & Karaoke Linguistik Analiz</h3>
         <input type="text" id="lyricsSongInput" placeholder="Şarkı adı veya sanatçı (Örn: Marco Borsato)...">
         <button class="ai-btn" id="generateLyricsBtn" style="width:100%; justify-content:center;">🎶 Şarkı Sözlerini Parçala</button>
-        <div id="lyricsResult" class="correction-box" style="display:none; max-height:260px; overflow-y:auto; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch;"></div>
+        <div id="lyricsResult" class="correction-box" style="display:none; overflow-y:auto; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch;"></div>
         <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('lyricsModal')">Kapat</button></div>
     </div>
 
@@ -734,9 +881,9 @@
             <div class="stat-card blue"><div class="stat-number" id="statsTotalRepetitions">0</div><div class="stat-label">Tekrarlar</div></div>
             <div class="stat-card red"><div class="stat-number" id="statsTotalErrors">0</div><div class="stat-label">Toplam Hata</div></div>
         </div>
-        <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border);">
-            <div style="font-size:12px; font-weight:700; margin-bottom:6px; color:var(--subtle);">📅 Son 7 Gün</div>
-            <div class="week-chart" id="weekChart"></div>
+        <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border); overflow: hidden;">
+            <div style="font-size:12px; font-weight:700; margin-bottom:10px; color:var(--subtle);">📅 Öğrenme Trendi (Haftalık)</div>
+            <canvas id="statsChart"></canvas>
         </div>
         <div style="background: var(--surface2); border-radius: 14px; padding: 14px; border: 1px solid var(--border);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -764,6 +911,11 @@
         <button class="btn-secondary" style="width: 100%; margin-bottom: 8px; border-color: var(--green);" onclick="document.getElementById('importCsvInput').click()">📊 Toplu Kart İçe Aktar (CSV)</button>
         <input type="file" id="importCsvInput" style="display:none;" accept=".csv,.txt">
         <div style="font-size: 11px; color: var(--subtle); margin-bottom: 8px; padding: 8px; background: var(--surface2); border-radius: 10px;">CSV formatı: <code>kelime,anlam,örnek_cümle</code> (her satır bir kart)</div>
+        <div style="margin-top:10px; padding:10px; border-top:1px solid var(--border);">
+            <label style="display:flex; align-items:center; gap:10px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" id="oledToggle" style="width:18px; height:18px;"> 🌑 OLED Saf Siyah Modu
+            </label>
+        </div>
         <button class="btn-danger" style="width:100%;" id="resetApiKeyBtn">🔑 Groq API Anahtarını Sil</button>
         <div class="modal-buttons"><button class="btn-secondary" onclick="closeModal('settingsModal')">Kapat</button></div>
     </div>
@@ -805,6 +957,7 @@
 
     <!-- PERSISTENT APP STATE SCRIPT ARCHITECTURE -->
     <script>
+        let activeUtterance = null; // Safari Garbage Collector fix
         // CORE APPLICATION DATABASE ENGINE (Mevcut CSV yapısıyla tam uyumlu)
         let appData = {
             decks: [
@@ -812,12 +965,13 @@
                 { id: "fiiller", name: "Sık Kullanılan Fiiller" }
             ],
             cards: [
-                { id: "c1", deckId: "genel", word: "de auto", meaning: "araba", sentence: "Ik koop een nieuwe de auto.", repetitions: 0, wrong: 0, modeStats: {} },
-                { id: "c2", deckId: "genel", word: "het huis", meaning: "ev", sentence: "Dit is bir büyük het huis.", repetitions: 0, wrong: 0, modeStats: {} },
+                { id: "c1", deckId: "genel", word: "de auto", meaning: "araba", sentence: "Ik koop een nieuwe auto.", repetitions: 0, wrong: 0, modeStats: {} },
+                { id: "c2", deckId: "genel", word: "het huis", meaning: "ev", sentence: "Dit is een groot huis.", repetitions: 0, wrong: 0, modeStats: {} },
                 { id: "c3", deckId: "fiiller", word: "maken", meaning: "yapmak", sentence: "Zij maken hun huiswerk.", repetitions: 0, wrong: 0, modalConjugation: "maak,maakt,maken", verbPresent: "maak", verbPastSingular: "maakte", verbPastPlural: "maakten", verbPerfect: "gemaakt" }
             ],
             stats: { streak: 0, lastStudyDate: null, totalRepetitions: 0, totalErrors: 0 },
             groqKey: null,
+            encryptedGroqKey: null,
             multiDeckIds: [],
             achievements: [
                 { id: 0, name: "İlk Adım", earned: false },
@@ -826,10 +980,12 @@
         };
 
         let currentCard = null;
+        let currentCardIndex = 0;
+        let currentFilteredCards = [];
         let activeDeckId = "genel";
         let activeMode = "classic";
         let studyDirection = "NL2TR"; // NL2TR | TR2NL | random
-        let aiContextFetchedForId = null;
+        let sessionGroqKey = null;
         let sessionHistory = [];
         let matchingSelected = null;
         let matchingAnswers = {};
@@ -842,8 +998,20 @@
         let podcastPlaying = false;
         let podcastLines = [];
         let podcastCurrentLine = 0;
-        let sessionCompletedIds = []; // Mevcut oturumda başarıyla geçilen kartlar
         let deferredPrompt = null; // PWA Install event placeholder
+
+        // PREMIUM MASCOT SVG COMPONENT
+        const MASCOTS = {
+            happy: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#F97316" fill-opacity="0.1" stroke="#F97316" stroke-width="2"/><circle cx="35" cy="40" r="5" fill="#F97316"/><circle cx="65" cy="40" r="5" fill="#F97316"/><path d="M30 65 Q50 80 70 65" stroke="#F97316" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
+            thinking: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#8B5CF6" fill-opacity="0.1" stroke="#8B5CF6" stroke-width="2"/><circle cx="35" cy="45" r="4" fill="#8B5CF6"/><circle cx="65" cy="45" r="4" fill="#8B5CF6"/><path d="M40 70 h20" stroke="#8B5CF6" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
+            empty: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#94A3B8" fill-opacity="0.1" stroke="#94A3B8" stroke-width="2"/><circle cx="35" cy="45" r="3" fill="#94A3B8"/><circle cx="65" cy="45" r="3" fill="#94A3B8"/><path d="M35 70 Q50 60 65 70" stroke="#94A3B8" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+            sad: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#EF4444" fill-opacity="0.1" stroke="#EF4444" stroke-width="2"/><circle cx="35" cy="45" r="4" fill="#EF4444"/><circle cx="65" cy="45" r="4" fill="#EF4444"/><path d="M30 75 Q50 60 70 75" stroke="#EF4444" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`
+        };
+
+        function setMascot(id, type) {
+            const container = document.getElementById(id);
+            if (container) container.innerHTML = MASCOTS[type] || MASCOTS.happy;
+        }
 
         // INITIALIZATION LOADER
         function initApp() {
@@ -858,17 +1026,27 @@
             if (!appData.decks) appData.decks = [];
             if (!appData.multiDeckIds) appData.multiDeckIds = [];
             if (!appData.cards) appData.cards = [];
+            if (!appData.stats.weeklyData) appData.stats.weeklyData = {};
+            if (appData.stats.todayReps === undefined) appData.stats.todayReps = 0;
             
-            // Check for API Key Gate
-            if (!appData.groqKey) {
+            // Şifreleme Kontrollü Başlatma
+            if (appData.encryptedGroqKey) {
                 document.getElementById("groqSetupScreen").style.display = "flex";
+                document.getElementById("groqKeyInput").style.display = "none";
+                document.getElementById("saveGroqKeyBtn").style.display = "none";
+                document.getElementById("unlockGroqBtn").style.display = "block";
+                document.getElementById("groqSetupDesc").innerHTML = "AI özellikleri şifreli. Devam etmek için <b>Master Şifrenizi</b> girin.";
+            } else if (appData.groqKey) {
+                sessionGroqKey = appData.groqKey;
+                document.getElementById("groqSetupScreen").style.display = "none";
             } else {
-                document.getElementById("groqKeyInput").value = appData.groqKey;
+                document.getElementById("groqSetupScreen").style.display = "flex";
             }
             
             setupEventListeners();
             applyStoredTheme();
             renderSidebar();
+            applyDyslexicPreference();
             selectDeck(activeDeckId);
             updateGlobalStreak();
             registerServiceWorker();
@@ -936,16 +1114,9 @@
         }
 
         function toggleSidebar(e) {
-            if (e) {
-                if (e.cancelable) e.preventDefault();
-                e.stopPropagation();
-            }
+            if (e && e.cancelable) { e.preventDefault(); e.stopPropagation(); }
             const sidebar = document.getElementById("sidebar");
-            if (sidebar.classList.contains("open")) { 
-                closeSidebar(); 
-            } else { 
-                openSidebar(); 
-            }
+            if (sidebar.classList.contains("open")) { closeSidebar(); } else { openSidebar(); }
         }
 
 function save() {
@@ -957,12 +1128,8 @@ function save() {
             // Layout hooks
             const menuBtn = document.getElementById("menuBtn");
             if (menuBtn) {
-                // iOS Safari'de 300ms gecikmesi artık yok, sadece click yeterli ve daha güvenli
-                menuBtn.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleSidebar();
-                };
+                menuBtn.onclick = toggleSidebar;
+                menuBtn.addEventListener("touchstart", toggleSidebar, { passive: false });
             }
 
             const streakBadge = document.getElementById("streakBadge");
@@ -973,6 +1140,19 @@ function save() {
 
             const themeBtn = document.getElementById("themeToggleBtn");
             if (themeBtn) themeBtn.onclick = toggleTheme;
+
+            const dyslexicToggle = document.getElementById("dyslexicToggle");
+            if (dyslexicToggle) dyslexicToggle.onchange = (e) => {
+                appData.dyslexicMode = e.target.checked;
+                save();
+                applyDyslexicPreference();
+            };
+            
+            const oledToggle = document.getElementById("oledToggle");
+            if (oledToggle) oledToggle.onchange = (e) => {
+                document.body.classList.toggle("oled", e.target.checked);
+                localStorage.setItem("linguaprime_oled", e.target.checked);
+            };
 
             // Deste renk seçici
             document.addEventListener("click", (e) => {
@@ -1033,6 +1213,7 @@ function save() {
 
             // Modal Buttons
             document.getElementById("saveGroqKeyBtn").onclick = saveGroqKey;
+            document.getElementById("unlockGroqBtn").onclick = unlockGroqKey;
             document.getElementById("saveNewDeckBtn").onclick = addNewDeck;
             document.getElementById("saveManualCardBtn").onclick = addNewCardManual;
             document.getElementById("startMultiDeckBtn").onclick = startMultiDeckSession;
@@ -1044,16 +1225,25 @@ function save() {
             document.getElementById("btnEasy").onclick = () => handleAnswer("easy");
             document.getElementById("undoBtn").onclick = triggerUndo;
             
-            let isProcessingSwipe = false;
-            document.getElementById("mainCard").onclick = (e) => {
-                if (isProcessingSwipe) {
-                    isProcessingSwipe = false;
-                    return;
-                }
-                if(!e.target.closest('button') && !e.target.closest('input')) {
-                    flipCard();
-                }
+            // TIKLAMA VE DOKUNMA ÇAKIŞMASINI ÖNLEYEN FLIP MANTIĞI
+            const handleFlip = (e) => {
+                // Eğer tıklanan yer test alanları, butonlar, girdiler veya etkileşimli kutular ise kartı ÇEVİRME
+                if (
+                    e.target.closest('button') || 
+                    e.target.closest('input') || 
+                    e.target.closest('.wv-word') || 
+                    e.target.closest('.woordvolgorde-zone') || 
+                    e.target.closest('#testArea') || 
+                    e.target.closest('.verb-drill-row')
+                ) return;
+                
+                // Eğer kart kaydırılıyorsa çevirme
+                if (window.isDraggingCard) return; 
+                
+                document.getElementById("mainCard").classList.toggle("flipped");
             };
+
+            document.getElementById("mainCard").addEventListener('click', handleFlip);
 
             // SWIPE GESTURE DESTEĞI (iOS Safari dahil)
             (function() {
@@ -1069,7 +1259,7 @@ function save() {
                     startX = touch.clientX;
                     startY = touch.clientY;
                     startTime = Date.now();
-                    isDragging = false;
+                    window.isDraggingCard = false;
                 }
 
                 function onTouchMove(e) {
@@ -1078,10 +1268,10 @@ function save() {
                     const dx = touch.clientX - startX;
                     const dy = touch.clientY - startY;
                     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
-                        isDragging = true;
+                        window.isDraggingCard = true;
                         if (e.cancelable) e.preventDefault();
                         const opacity = Math.min(Math.abs(dx) / SWIPE_THRESHOLD, 1);
-                        card.style.transform = `translateX(${dx * 0.4}px) rotate(${dx * 0.03}deg)`;
+                        card.style.transform = `translate3d(${dx * 0.4}px, 0, 0) rotate(${dx * 0.08}deg)`;
                         const rightIcon = card.querySelector('.swipe-icon.right');
                         const leftIcon = card.querySelector('.swipe-icon.left');
                         if (rightIcon) rightIcon.style.opacity = dx > 0 ? opacity : 0;
@@ -1091,36 +1281,30 @@ function save() {
 
                 function onTouchEnd(e) {
                     if (!startX) return;
-                    // Swipe işlemi yapıldıysa click olayını bastır
-                    if (isDragging) isProcessingSwipe = true;
-                    
                     const touch = e.changedTouches ? e.changedTouches[0] : e;
                     const dx = touch.clientX - startX;
                     const dy = touch.clientY - startY;
                     const elapsed = Date.now() - startTime;
                     
-                    card.style.transition = 'transform 0.3s cubic-bezier(.4,0,.2,1)';
+                    card.classList.add('snapping');
                     card.style.transform = '';
                     const rightIcon = card.querySelector('.swipe-icon.right');
                     const leftIcon = card.querySelector('.swipe-icon.left');
                     if (rightIcon) rightIcon.style.opacity = 0;
                     if (leftIcon) leftIcon.style.opacity = 0;
-                    setTimeout(() => { card.style.transition = ''; }, 300);
+                    setTimeout(() => { card.classList.remove('snapping'); }, 450);
 
-                    if (isDragging && elapsed < SWIPE_TIME_LIMIT) {
+                    if (window.isDraggingCard && elapsed < SWIPE_TIME_LIMIT) {
                         if (dx > SWIPE_THRESHOLD) {
                             handleAnswer("good");
                         } else if (dx < -SWIPE_THRESHOLD) {
                             handleAnswer("again");
                         }
-                    } else if (!isDragging && Math.abs(dx) < 10 && Math.abs(dy) < 10 && elapsed < 300) {
-                        // Tap - flip
-                        if (!e.target.closest('button') && !e.target.closest('input')) {
-                            flipCard();
-                        }
                     }
-
-                    startX = 0; startY = 0; isDragging = false;
+                    
+                    // Küçük bir gecikmeyle dragging durumunu sıfırla ki click tetiklenmesin
+                    setTimeout(() => { window.isDraggingCard = false; }, 50);
+                    startX = 0; startY = 0;
                 }
 
                 card.addEventListener('touchstart', onTouchStart, { passive: true });
@@ -1148,14 +1332,19 @@ function save() {
                 switch(e.key) {
                     case " ": case "Enter":
                         e.preventDefault();
-                        flipCard();
+                        document.getElementById("mainCard").classList.toggle("flipped");
                         break;
                     case "1": handleAnswer("again"); break;
                     case "2": handleAnswer("hard"); break;
                     case "3": handleAnswer("good"); break;
                     case "4": handleAnswer("easy"); break;
                     case "z": case "Z": triggerUndo(); break;
-                    case "ArrowLeft": handleAnswer("again"); break;
+                    case "ArrowLeft": 
+                        if (activeMode === "mcq") {
+                            // MCQ modunda 1. şıkkı seçebiliriz
+                        }
+                        handleAnswer("again"); 
+                        break;
                     case "ArrowRight": handleAnswer("good"); break;
                 }
             });
@@ -1207,6 +1396,7 @@ function save() {
                 "rpgCustomInput":  () => handleRpgMove(),
                 "newDeckNameInput":() => addNewDeck(),
                 "groqKeyInput":    () => saveGroqKey(),
+                "masterPasswordInput": () => appData.encryptedGroqKey ? unlockGroqKey() : saveGroqKey(),
                 "aiDictQuery":     () => handleAiDictionary(),
                 "memoryWordInput": () => handleMemoryPalace(),
                 "correctionInput": () => handleSentenceCorrection(),
@@ -1223,11 +1413,13 @@ function save() {
         function renderSidebar() {
             const container = document.getElementById("deckListSidebar");
             container.innerHTML = "";
-
+            
             // "Tüm Kartlar" statik girişi
             const allItem = document.createElement("div");
+            const allNewCount = appData.cards.filter(c => (c.repetitions || 0) === 0 && (c.wrong || 0) === 0).length;
+            const allDueCount = getDueCards(appData.cards).length;
             allItem.className = `sidebar-item ${activeDeckId === "all" ? 'active' : ''}`;
-            allItem.innerHTML = `<span>📚 Tüm Kartlar (${appData.cards.length})</span>`;
+            allItem.innerHTML = `<span>📚 Tüm Kartlar <span style="opacity:0.6; font-size:11px;">${appData.cards.length} kart · ${allNewCount} yeni · ${allDueCount} bekliyor</span></span>`;
             allItem.onclick = () => { activeDeckId = "all"; renderSidebar(); selectDeck("all"); closeAllDrawers(); };
             container.appendChild(allItem);
 
@@ -1240,7 +1432,10 @@ function save() {
             }
 
             appData.decks.forEach(deck => {
-                const count = appData.cards.filter(c => c.deckId === deck.id).length;
+                const deckCards = appData.cards.filter(c => c.deckId === deck.id);
+                const count = deckCards.length;
+                const newCount = deckCards.filter(c => (c.repetitions || 0) === 0 && (c.wrong || 0) === 0).length;
+                const dueCount = getDueCards(deckCards).length;
                 const item = document.createElement("div");
                 item.className = `sidebar-item ${deck.id === activeDeckId ? 'active' : ''}`;
                 const color = deck.color || "#F97316";
@@ -1248,7 +1443,7 @@ function save() {
                 item.innerHTML = `
                     <span style="display:flex; align-items:center; gap:6px;">
                         <span class="deck-color-dot" style="background:${color};"></span>
-                        ${emoji} ${deck.name} <span style="opacity:0.6; font-size:11px;">(${count})</span>
+                        ${emoji} ${deck.name} <span style="opacity:0.6; font-size:11px;">${count} kart · ${newCount} yeni · ${dueCount} bekliyor</span>
                     </span>
                     <div class="sidebar-item-actions">
                         <button class="delete-deck-btn" onclick="deleteDeck('${deck.id}', event)">🗑</button>
@@ -1322,73 +1517,77 @@ function save() {
             return cards.filter(c => !c.nextReview || c.nextReview <= now);
         }
 
-        // CORE STUDY FLOW MECHANICS
-        function selectDeck(deckId) {
-            let allFiltered = [];
+        function getDeckCards(deckId) {
             if (deckId === "all") {
-                allFiltered = appData.cards;
-            } else if (deckId === "multi") {
-                allFiltered = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId));
+                return appData.cards;
+            }
+            if (deckId === "multi") {
+                return appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId));
+            }
+            return appData.cards.filter(c => c.deckId === deckId);
+        }
+
+        function moveToNextCard(answeredCardId) {
+            const deckCards = getDeckCards(activeDeckId);
+            const dueCards = getDueCards(deckCards);
+            const preferredPool = dueCards.length > 0 ? dueCards : deckCards;
+            let nextPool = preferredPool.filter(c => c.id !== answeredCardId);
+
+            if (nextPool.length === 0 && deckCards.length > 0) {
+                nextPool = deckCards;
+            }
+
+            const nextCard = nextPool[0];
+            if (nextCard) {
+                currentFilteredCards = preferredPool.includes(nextCard) ? preferredPool : deckCards;
+                currentCardIndex = currentFilteredCards.findIndex(c => c.id === nextCard.id);
+                if (currentCardIndex < 0) currentCardIndex = 0;
             } else {
-                allFiltered = appData.cards.filter(c => c.deckId === deckId);
+                currentCardIndex = 0;
             }
 
-            // Önce vadesi gelenler, yoksa tüm kartlar
-            const dueCards = getDueCards(allFiltered);
-            const newCards = allFiltered.filter(c => !c.repetitions || c.repetitions === 0);
+            selectDeck(activeDeckId, false);
+        }
 
-            // UI Sayacı Güncelleme
-            document.getElementById("newCount").textContent = newCards.length;
-            document.getElementById("dueCount").textContent = dueCards.length;
-            document.getElementById("totalCount").textContent = allFiltered.length;
-            document.getElementById("sessionCount").textContent = sessionCompletedIds.length;
-
-            // OTURUM MANTIĞI: Henüz bu oturumda tamamlanmamış (bilinmemiş) kartları filtrele
-            let availableCards = allFiltered.filter(c => !sessionCompletedIds.includes(c.id));
-
-            // Eğer tüm kartlar en az bir kez başarıyla geçildiyse döngüyü sıfırla
-            if (availableCards.length === 0 && allFiltered.length > 0) {
-                sessionCompletedIds = [];
-                availableCards = allFiltered;
-                showToast("Deste tamamlandı, baştan başlanıyor...", "var(--purple)");
+        /**
+         * CORE STUDY FLOW MECHANICS
+         * Modified to include index management and prevent transition bugs.
+         */
+        function selectDeck(deckId, resetIndex = true) {
+            let allFiltered = getDeckCards(deckId);
+            
+            if (resetIndex) {
+                currentCardIndex = 0;
+                activeDeckId = deckId;
             }
 
-            if (availableCards.length > 0) {
-                // Havuz içinde önceliklendirme: Vadesi Gelenler > Yeni Kartlar > Diğerleri
-                let pool = [];
-                const dueInAvailable = availableCards.filter(c => dueCards.some(dc => dc.id === c.id));
-                const newInAvailable = availableCards.filter(c => newCards.some(nc => nc.id === c.id));
+            // Update Ambient Glow
+            const ambientGlow = document.getElementById("ambientGlow");
+            if (ambientGlow) {
+                const activeDeck = appData.decks.find(d => d.id === deckId);
+                ambientGlow.style.background = activeDeck ? activeDeck.color : "var(--orange)";
+            }
 
-                if (dueInAvailable.length > 0) pool = dueInAvailable;
-                else if (newInAvailable.length > 0) pool = newInAvailable;
-                else pool = availableCards;
+            // Filter cards: Due cards first, then fallback to all cards
+            currentFilteredCards = getDueCards(allFiltered);
+            if (currentFilteredCards.length === 0) currentFilteredCards = allFiltered;
 
-                // Aynı kartın üst üste gelmesini engelle
-                if (pool.length > 1 && currentCard) {
-                    pool = pool.filter(c => c.id !== currentCard.id);
-                }
+            if (currentFilteredCards.length > 0) {
+                // Index Safety Check (Adım 1: İndeks Sınır Yönetimi)
+                if (currentCardIndex >= currentFilteredCards.length) currentCardIndex = 0;
+                if (currentCardIndex < 0) currentCardIndex = currentFilteredCards.length - 1;
 
-                currentCard = pool[Math.floor(Math.random() * pool.length)];
-                
+                currentCard = currentFilteredCards[currentCardIndex];
                 renderCurrentCardMode();
                 setActionButtonsState(true);
-
-                // EKSİKLİK 2: Otomatik Ses Çalma (UX İyileştirmesi)
-                const isReversed = (studyDirection === "TR2NL" || (studyDirection === "random" && Math.random() > 0.5));
-                if (!isReversed) {
-                    setTimeout(() => speakTts(currentCard.word, "nl-NL"), 600);
-                }
-
-                // Progress text: kaç kart vadesi gelmiş
-                document.getElementById("progressText").textContent =
-                    dueCards.length > 0 || newCards.length > 0
-                        ? `🎯 Hedef: Tüm kartları yeşile çevir!`
-                        : `🎉 Tebrikler! Bu destedeki tüm vadesi gelen kartları bitirdiniz.`;
-                if (dueCards.length === 0 && allFiltered.length > 0 && newCards.length === 0) triggerConfetti();
             } else {
                 currentCard = null;
                 document.getElementById("cardFrontWord").textContent = "Kart Yok";
                 document.getElementById("cardBackMeaning").textContent = "Lütfen Bu Desteye Kart Ekleyin";
+                document.getElementById("cardBackSentence").textContent = "Örnek cümle bulunmuyor.";
+                setCardStory("", "");
+                const storyBtn = document.getElementById("generateCardStoryBtn");
+                if (storyBtn) storyBtn.disabled = true;
                 setActionButtonsState(false);
             }
             updateProgress();
@@ -1398,13 +1597,6 @@ function save() {
             if (!currentCard) return;
             const cardEl = document.getElementById("mainCard");
             cardEl.classList.remove("flipped");
-            
-            // AI Context Sıfırlama
-            aiContextFetchedForId = null;
-            document.getElementById("ai-grammar").textContent = "Kartı çevirince yüklenir...";
-            document.getElementById("ai-story").textContent = "";
-            document.getElementById("ai-media-scene").textContent = "";
-            document.getElementById("ai-multimedia-context").classList.remove('animate-pulse');
 
             // Yönü belirle
             let dir = studyDirection;
@@ -1422,9 +1614,12 @@ function save() {
             setTimeout(() => {
                 document.getElementById("cardDeckBadge").textContent = appData.decks.find(d => d.id === currentCard.deckId)?.name || "Genel";
                 document.getElementById("cardFrontWord").textContent = frontText;
-                if (frontTTS === "nl-NL" && activeMode === "classic") speakTts(frontText, "nl-NL"); // Mod değişiminde de ses
                 document.getElementById("cardBackMeaning").textContent = backText;
                 document.getElementById("cardBackSentence").textContent = currentCard.sentence || "Örnek cümle bulunmuyor.";
+                setCardStory(currentCard.story || "", currentCard.storyTranslation || "");
+                const mnemonicBox = document.getElementById("cardMnemonic");
+                if (mnemonicBox) { mnemonicBox.textContent = currentCard.mnemonic || ""; mnemonicBox.style.display = currentCard.mnemonic ? "block" : "none"; }
+                
                 // Doğruluk oranı
                 const totalAns = (currentCard.repetitions || 0) + (currentCard.wrong || 0);
                 const accuracy = totalAns > 0 ? Math.round((1 - (currentCard.wrong || 0) / totalAns) * 100) : null;
@@ -1439,6 +1634,10 @@ function save() {
                 document.getElementById("frontTTSBtn").onclick = (e) => { e.stopPropagation(); speakTts(frontText, frontTTS); };
                 document.getElementById("backTTSBtn").textContent = `🔊 Oku (${backLang})`;
                 document.getElementById("backTTSBtn").onclick = (e) => { e.stopPropagation(); speakTts(backText, backTTS); };
+                const storyBtn = document.getElementById("generateCardStoryBtn");
+                if (storyBtn) {
+                    storyBtn.onclick = (e) => { e.stopPropagation(); generateStoryForCurrentCard(); };
+                }
 
                 const testArea = document.getElementById("testArea");
                 testArea.innerHTML = "";
@@ -1453,27 +1652,6 @@ function save() {
                     inp.autocorrect = "off";
                     inp.autocapitalize = "off";
                     inp.spellcheck = false;
-
-                    // Karakter butonları paneli (İngilizce klavye kullananlar için)
-                    const charBar = document.createElement("div");
-                    charBar.style.cssText = "display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap; justify-content:center;";
-                    // Eğer TR->NL ise Hollandaca karakterler, değilse Türkçe karakterler gösterilir
-                    const specialChars = isReversed ? ['ë', 'é', 'è', 'ï', 'ij'] : ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'];
-                    specialChars.forEach(c => {
-                        const b = document.createElement("button");
-                        b.className = "mode-btn";
-                        b.style.cssText = "padding:6px 12px; min-width:35px; background:var(--surface3);";
-                        b.textContent = c;
-                        b.onclick = (e) => {
-                            e.stopPropagation();
-                            const start = inp.selectionStart;
-                            inp.value = inp.value.substring(0, start) + c + inp.value.substring(inp.selectionEnd);
-                            inp.focus();
-                            inp.setSelectionRange(start + c.length, start + c.length);
-                        };
-                        charBar.appendChild(b);
-                    });
-
                     const hint = document.createElement("div");
                     hint.className = "type-hint";
                     hint.textContent = `${backText.length} karakter`;
@@ -1481,17 +1659,10 @@ function save() {
                     checkBtn.className = "btn-primary";
                     checkBtn.style.cssText = "margin-top:8px; width:100%; max-width:340px;";
                     checkBtn.textContent = "Kontrol Et ↵";
-
                     const checkTyping = () => {
                         const val = inp.value.trim().toLowerCase();
                         const correct = backText.trim().toLowerCase();
-
-                        // Normalizasyon: İngilizce klavye uyumluluğu için (ı->i, ğ->g vb.)
-                        const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                            .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ş/g, 's')
-                            .replace(/ç/g, 'c').replace(/ü/g, 'u').replace(/ö/g, 'o');
-
-                        if (val === correct || norm(val) === norm(correct)) {
+                        if (val === correct) {
                             inp.className = "type-input correct";
                             showToast("✓ Doğru!", "var(--green)");
                             cardEl.classList.add("flipped");
@@ -1507,40 +1678,89 @@ function save() {
                     inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); checkTyping(); } });
                     const wrap = document.createElement("div");
                     wrap.className = "type-input-area";
-                    wrap.appendChild(charBar);
                     wrap.appendChild(inp);
                     wrap.appendChild(hint);
                     wrap.appendChild(checkBtn);
                     testArea.appendChild(wrap);
                     setTimeout(() => inp.focus(), 50);
                 } else if (activeMode === "hint") {
-                    let mask = frontText.replace(/[a-zA-ZğüşıöçĞÜŞİÖÇ]/g, "_ ");
-                    testArea.innerHTML = `<div style="font-family:'Space Mono'; color:var(--orange); font-weight:700; font-size:14px; letter-spacing:2px;">İpucu: ${mask}</div>`;
+                    // 1. Gelişmiş Harf İpucu (Hint) Modülü
+                    let revealed = 0;
+                    const targetWord = backText;
+                    
+                    const hintDisplay = document.createElement("div");
+                    hintDisplay.style.cssText = "font-size: 20px; font-family: 'Space Mono', monospace; letter-spacing: 2px; margin: 10px 0; min-height: 30px; color: var(--orange);";
+                    
+                    const updateHintDisplay = () => {
+                        let displayStr = "";
+                        for (let i = 0; i < targetWord.length; i++) {
+                            const char = targetWord[i];
+                            if (char === " ") {
+                                displayStr += "  ";
+                            } else if (i < revealed) {
+                                displayStr += char;
+                            } else {
+                                displayStr += "_";
+                            }
+                        }
+                        hintDisplay.textContent = displayStr;
+                    };
+                    
+                    const hintBtn = document.createElement("button");
+                    hintBtn.className = "btn-secondary";
+                    hintBtn.style.cssText = "font-size: 11px; padding: 6px 12px; margin-top: 5px;";
+                    hintBtn.textContent = "💡 Harf İste";
+                    hintBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (revealed < targetWord.length) {
+                            revealed++;
+                            updateHintDisplay();
+                        }
+                        if (revealed >= targetWord.length) {
+                            hintBtn.disabled = true;
+                            cardEl.classList.add("flipped");
+                        }
+                    };
+                    
+                    updateHintDisplay();
+                    const wrap = document.createElement("div");
+                    wrap.className = "type-input-area";
+                    wrap.appendChild(hintDisplay);
+                    wrap.appendChild(hintBtn);
+                    testArea.appendChild(wrap);
                 } else if (activeMode === "mcq") {
-                    const correct = backText;
-                    const pool = appData.cards.filter(c => c.id !== currentCard.id).map(c => isReversed ? c.word : c.meaning);
-                    const options = [correct];
-                    const shuffled = pool.sort(() => Math.random() - 0.5);
-                    for (let p of shuffled) { if (!options.includes(p)) { options.push(p); if (options.length >= 4) break; } }
-                    options.sort(() => Math.random() - 0.5);
-                    options.forEach(opt => {
+                    // Çoktan Seçmeli (MCQ) Modu - Kullanıcı Önerisiyle Güncellendi
+                    const mcqGrid = document.createElement("div");
+                    mcqGrid.style.cssText = "display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; max-width: 340px; margin: 10px auto 0;";
+                    
+                    let pool = appData.cards.filter(c => c.id !== currentCard.id).map(c => isReversed ? (c.word || "") : (c.meaning || ""));
+                    pool = [...new Set(pool)]; 
+                    pool.sort(() => 0.5 - Math.random());
+                    let choices = pool.slice(0, 3);
+                    choices.push(backText); 
+                    choices.sort(() => 0.5 - Math.random()); 
+                    
+                    choices.forEach(choice => {
                         const btn = document.createElement("button");
                         btn.className = "btn-secondary";
-                        btn.style.cssText = "width:100%; margin-top:6px; text-align:left; padding:10px 14px;";
-                        btn.textContent = opt;
+                        btn.style.cssText = "text-align: left; padding: 10px 14px; font-size: 13px; font-weight: 600; width: 100%;";
+                        btn.textContent = choice;
                         btn.onclick = (e) => {
                             e.stopPropagation();
-                            if (opt === correct) {
-                                btn.style.background = "var(--green)"; btn.style.color = "white";
-                                showToast("✓ Doğru!", "var(--green)");
+                            if (choice === backText) {
+                                showToast("✓ Doğru Seçenek!", "var(--green)");
                                 cardEl.classList.add("flipped");
+                                handleAnswer("good");
                             } else {
-                                btn.style.background = "var(--red)"; btn.style.color = "white";
-                                showToast("✗ Yanlış!", "var(--red)");
+                                btn.style.borderColor = "var(--red)";
+                                btn.style.background = "rgba(239,68,68,0.05)";
+                                showToast("✗ Yanlış Seçenek!", "var(--red)");
+                                handleAnswer("again");
                             }
                         };
-                        testArea.appendChild(btn);
+                        mcqGrid.appendChild(btn);
                     });
+                    testArea.appendChild(mcqGrid);
                 } else if (activeMode === "verbdrill") {
                     testArea.innerHTML = `
                         <div class="verb-drill-grid">
@@ -1575,16 +1795,95 @@ function save() {
             }, 460);
         }
 
+        function checkMcq(opt, correct, btn) {
+            if (opt === correct) {
+                btn.style.background = "var(--green)"; btn.style.color = "white";
+                showToast("✓ Doğru!", "var(--green)");
+                setTimeout(() => { document.getElementById("mainCard").classList.add("flipped"); handleAnswer("good"); }, 500);
+            } else {
+                btn.style.background = "var(--red)"; btn.style.color = "white";
+                showToast("✗ Yanlış!", "var(--red)");
+            }
+        }
+
+        // 3. PUZZLE MODE (WORDVOLGORDE) - Gelişmiş ve Güvenli Versiyon
+        function buildSentencePuzzle(sentence) {
+            const testArea = document.getElementById("testArea");
+            testArea.innerHTML = `
+                <div id="puzzleInputZone" class="woordvolgorde-zone" style="min-height: 52px; border: 2px dashed var(--orange); margin-bottom: 10px;"></div>
+                <div id="puzzleArea" class="woordvolgorde-zone" style="min-height: 52px; border: 1px solid var(--border);"></div>
+                <button class="btn-primary" style="width:100%; margin-top:12px;" onclick="checkPuzzleAnswer()">Kontrol Et ↵</button>
+            `;
+            
+            const puzzleArea = document.getElementById("puzzleArea");
+            const inputZone = document.getElementById("puzzleInputZone");
+            
+            if(!sentence) {
+                puzzleArea.innerHTML = "<p style='color:var(--subtle); font-size:12px;'>Bu kart için örnek cümle bulunamadı.</p>";
+                return;
+            }
+            
+            let words = sentence.trim().split(/\s+/);
+            let shuffled = [...words];
+            
+            // Güvenli karıştırma: Tek kelimelik cümlelerde sonsuz döngüyü engeller
+            if (words.length > 1) {
+                let attempts = 0;
+                while(shuffled.join(" ") === sentence.trim() && attempts < 12) {
+                    shuffled.sort(() => Math.random() - 0.5);
+                    attempts++;
+                }
+            }
+            
+            shuffled.forEach(w => {
+                let btn = document.createElement("span");
+                btn.className = "wv-word";
+                btn.textContent = w;
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (btn.parentElement === puzzleArea) {
+                        inputZone.appendChild(btn);
+                    } else {
+                        puzzleArea.appendChild(btn);
+                    }
+                };
+                puzzleArea.appendChild(btn);
+            });
+        }
+
+        function checkPuzzleAnswer() {
+            if(!currentCard) return;
+            let zone = document.getElementById("puzzleInputZone");
+            let userAns = Array.from(zone.querySelectorAll(".wv-word")).map(b => b.textContent).join(" ");
+            let target = currentCard.sentence ? currentCard.sentence.trim() : "";
+            
+            if(normalizeForComparison(userAns) === normalizeForComparison(target)) {
+                showToast("Mükemmel! Cümle dizilimi doğru.", "var(--green)");
+                triggerConfetti();
+                speakTts(target, "nl-NL"); // Bilişsel Nörobilimci Tavsiyesi: İşitsel Pekiştirme
+                document.getElementById("mainCard").classList.add("flipped");
+                handleAnswer("good");
+            } else {
+                showToast("Hatalı dizilim, tekrar dene!", "var(--red)");
+                handleAnswer("again");
+            }
+        }
+
         function checkVerbDrill(e) {
             e.stopPropagation();
+            if (!currentCard || !currentCard.modalConjugation) {
+                showToast("Bu fiil için çekim verisi bulunamadı.", "var(--red)");
+                return;
+            }
+
             let checkList = (currentCard.modalConjugation || "maak,maakt,maken").split(",");
-            let u1 = document.getElementById("v1").value.trim();
-            let u2 = document.getElementById("v2").value.trim();
-            let u3 = document.getElementById("v3").value.trim();
+            let u1 = document.getElementById("v1").value;
+            let u2 = document.getElementById("v2").value;
+            let u3 = document.getElementById("v3").value;
             
-            document.getElementById("v1").className = `verb-input ${u1===checkList[0]?'correct':'wrong'}`;
-            document.getElementById("v2").className = `verb-input ${u2===checkList[1]?'correct':'wrong'}`;
-            document.getElementById("v3").className = `verb-input ${u3===checkList[2]?'correct':'wrong'}`;
+            document.getElementById("v1").className = `verb-input ${normalizeForComparison(u1)===normalizeForComparison(checkList[0])?'correct':'wrong'}`;
+            document.getElementById("v2").className = `verb-input ${normalizeForComparison(u2)===normalizeForComparison(checkList[1])?'correct':'wrong'}`;
+            document.getElementById("v3").className = `verb-input ${normalizeForComparison(u3)===normalizeForComparison(checkList[2])?'correct':'wrong'}`;
         }
 
         function checkGrammarFill(chosen, isCorrect, e) {
@@ -1596,47 +1895,49 @@ function save() {
         function handleAnswer(rating) {
             if (!currentCard) return;
 
-            // Geri alma için mevcut durumu kaydet
+            // Geri al (Undo) için tam durum yedeği al
             sessionHistory.push({
                 cardId: currentCard.id,
-                action: rating,
-                prevInterval: currentCard.interval,
-                prevEase: currentCard.ease,
-                prevNextReview: currentCard.nextReview
+                cardState: JSON.parse(JSON.stringify(currentCard)),
+                statsState: JSON.parse(JSON.stringify(appData.stats)),
+                currentCardIndex,
+                activeDeckId
             });
+            if (sessionHistory.length > 15) sessionHistory.shift();
+            const answeredCardId = currentCard.id;
 
             // ---- GERÇEK SM-2 ALGORİTMASI ----
-            if (currentCard.interval === undefined || isNaN(currentCard.interval)) currentCard.interval = 0;
-            if (!currentCard.ease || isNaN(currentCard.ease)) currentCard.ease = 2.5;
-            if (!currentCard.repetitions || isNaN(currentCard.repetitions)) currentCard.repetitions = 0;
+            if (!currentCard.interval) currentCard.interval = 0;
+            if (!currentCard.ease) currentCard.ease = 2.5;
+            if (!currentCard.repetitions) currentCard.repetitions = 0;
+            if (!currentCard.wrong) currentCard.wrong = 0;
 
-            const q = { again: 0, hard: 3, good: 4, easy: 5 }[rating];
+            const qScore = { again: 0, hard: 2, good: 4, easy: 5 }[rating];
 
-            if (q === 0) {
-                // Again: tekrar için kartı hemen yeniden vadelendir.
+            if (qScore < 3) {
+                // Hata veya Tekrar: Başa dön
                 currentCard.interval = 0;
                 currentCard.repetitions = 0;
+                currentCard.wrong++;
+                appData.stats.totalErrors = (appData.stats.totalErrors || 0) + 1;
             } else {
-                if (currentCard.interval === 0) {
-                    currentCard.interval = 1;
-                } else if (currentCard.repetitions === 1) {
-                    currentCard.interval = 6;
-                } else {
-                    currentCard.interval = Math.round(currentCard.interval * currentCard.ease);
-                }
+                if (currentCard.repetitions === 0) currentCard.interval = 1;
+                else if (currentCard.repetitions === 1) currentCard.interval = 6;
+                else currentCard.interval = Math.round(currentCard.interval * currentCard.ease);
                 currentCard.repetitions++;
             }
 
-            // Hatalı kartlar 1 dakika sonra tekrar gelir (Aynı oturum içinde), başarılılar günlere yayılır
-            const delay = (q < 3) ? 60000 : currentCard.interval * 86400000;
-
             // EF güncelle: EF' = EF + (0.1 - (5-q) * (0.08 + (5-q) * 0.02))
-            currentCard.ease = Math.max(1.3, currentCard.ease + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-            currentCard.nextReview = Date.now() + delay;
+            currentCard.ease = currentCard.ease + (0.1 - (5 - qScore) * (0.08 + (5 - qScore) * 0.02));
+            if (currentCard.ease < 1.3) currentCard.ease = 1.3;
+
+            // Bir Sonraki İnceleme Zamanı
+            currentCard.nextReview = Date.now() + currentCard.interval * 24 * 60 * 60 * 1000;
             // ----------------------------------
 
             // Seri hesaplama
             const today = new Date().toDateString();
+            const todayStr = new Date().toISOString().split("T")[0];
             if (appData.stats.lastStudyDate !== today) {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
@@ -1646,19 +1947,12 @@ function save() {
                 updateGlobalStreak();
             }
 
-            appData.stats.totalRepetitions = (appData.stats.totalRepetitions || 0) + 1;
-            if (rating === "again") {
-                appData.stats.totalErrors = (appData.stats.totalErrors || 0) + 1;
-                currentCard.wrong = (currentCard.wrong || 0) + 1;
-            }
-
-            // Günlük tekrar sayacı + haftalık veri
-            const todayStr = new Date().toDateString();
             if (appData.stats.todayDate !== todayStr) {
                 appData.stats.todayDate = todayStr;
                 appData.stats.todayReps = 0;
             }
             appData.stats.todayReps = (appData.stats.todayReps || 0) + 1;
+            appData.stats.totalRepetitions = (appData.stats.totalRepetitions || 0) + 1;
 
             // Haftalık veri: {dateStr: count}
             if (!appData.stats.weeklyData) appData.stats.weeklyData = {};
@@ -1674,79 +1968,46 @@ function save() {
             save();
             showToast(`${rating === "again" ? "↩ Tekrar" : rating === "hard" ? "😅 Zor" : rating === "good" ? "✓ İyi" : "⚡ Kolay"}`, 
                       rating === "again" ? "var(--red)" : rating === "hard" ? "var(--orange)" : rating === "good" ? "var(--green)" : "var(--blue)");
-            selectDeck(activeDeckId);
             
+            // Başarı kontrolü (Gamification)
+            checkAchievements();
+            
+            // Proceed to next card (Adım 2: Sonraki Buton Mantığı)
+            setTimeout(() => {
+                moveToNextCard(answeredCardId);
+            }, 150);
         }
 
-        // AI MULTIMEDIA CONTEXT ENGINE
-        function flipCard() {
-            const card = document.getElementById("mainCard");
-            card.classList.toggle("flipped");
-            
-            if (card.classList.contains("flipped") && currentCard && aiContextFetchedForId !== currentCard.id && appData.groqKey) {
-                fetchGroqMultimediaContext(currentCard.word);
+        function checkAchievements() {
+            const reps = appData.stats.totalRepetitions || 0;
+            if (reps === 10 && !appData.achievements[0].earned) {
+                appData.achievements[0].earned = true;
+                showToast("🏆 Başarı Açıldı: İlk Adım!", "var(--purple)");
+                triggerConfetti();
             }
-        }
-
-        async function fetchGroqMultimediaContext(word) {
-            const contextArea = document.getElementById("ai-multimedia-context");
-            if (!contextArea) return;
-
-            contextArea.classList.add("animate-pulse");
-            document.getElementById("ai-grammar").textContent = "Analiz ediliyor...";
-
-            const prompt = `Hollandaca '${word}' kelimesi için şunları içeren bir JSON üret: 
-            1. 'grammar': Kısa bir dilbilgisi notu (artikel, çoğul hali veya fiil ise çekimi).
-            2. 'story': Bu kelimeyi içeren, içinde kelimenin [${word}] şeklinde geçtiği çok kısa bir iki dilli (Hollandaca ve Türkçe çevirili) hikaye cümlesi.
-            3. 'movie_scene': Bu kelimenin kullanılabileceği hayali bir dizi/film sahnesi tasviri (Türkçe).
-            SADECE şu formatta geçerli bir JSON döndür, başka hiçbir şey yazma: {"grammar": "...", "story": "...", "movie_scene": "..."}`;
-
-            const res = await runGroqAi(prompt);
-            contextArea.classList.remove("animate-pulse");
-
-            try {
-                const clean = res.replace(/```json|```/g, "").trim();
-                const data = JSON.parse(clean);
-                renderAILayersToUI(data);
-                aiContextFetchedForId = currentCard.id;
-            } catch (e) {
-                document.getElementById("ai-grammar").textContent = "Bilgi şu an alınamadı.";
+            if ((appData.stats.streak || 0) >= 5 && !appData.achievements[1].earned) {
+                appData.achievements[1].earned = true;
+                showToast("🔥 Başarı Açıldı: İstikrarlı Öğrenci!", "var(--orange)");
+                triggerConfetti();
             }
-        }
-
-        function renderAILayersToUI(aiData) {
-            const grammarEl = document.getElementById('ai-grammar');
-            const storyEl = document.getElementById('ai-story');
-            const mediaEl = document.getElementById('ai-media-scene');
-            
-            if (grammarEl) grammarEl.textContent = aiData.grammar || "Dilbilgisi notu mevcut değil.";
-            if (storyEl) {
-                const storyHtml = (aiData.story || "").replace(/\[(.*?)\]/g, '<b style="color:var(--blue); text-decoration:underline;">$1</b>');
-                storyEl.innerHTML = storyHtml || "Hikaye üretilemedi.";
-            }
-            if (mediaEl) mediaEl.textContent = aiData.movie_scene || "Sahne tasviri mevcut değil.";
         }
 
         function triggerUndo() {
-            if (sessionHistory.length === 0) { showToast("Geri alınacak hamle yok.", "var(--muted)"); return; }
-            let last = sessionHistory.pop();
-            
-            // Kartı bul ve istatistiklerini geri al
-            let card = appData.cards.find(c => c.id === last.cardId);
-            if (card) {
-                card.repetitions = Math.max(0, (card.repetitions || 1) - 1);
-                if (last.action === "again") {
-                    appData.stats.totalErrors = Math.max(0, (appData.stats.totalErrors || 1) - 1);
-                    card.wrong = Math.max(0, (card.wrong || 1) - 1);
-                }
-                appData.stats.totalRepetitions = Math.max(0, (appData.stats.totalRepetitions || 1) - 1);
-                // interval ve ease geri al
-                if (last.prevInterval !== undefined) card.interval = last.prevInterval;
-                if (last.prevEase !== undefined) card.ease = last.prevEase;
-                save();
+            if (sessionHistory.length === 0) {
+                showToast("Geri alınacak hamle yok!", "var(--orange)");
+                return;
             }
-            showToast("Son hamle geri alındı.", "var(--purple)");
-            selectDeck(activeDeckId);
+            const previous = sessionHistory.pop();
+            const cardIdx = appData.cards.findIndex(c => c.id === previous.cardId);
+            if (cardIdx !== -1) {
+                appData.cards[cardIdx] = previous.cardState;
+                if (previous.statsState) appData.stats = previous.statsState;
+                currentCardIndex = previous.currentCardIndex || 0;
+                activeDeckId = previous.activeDeckId || activeDeckId;
+                save();
+                selectDeck(activeDeckId, false);
+                showToast("Son hamle geri alındı ↩", "var(--purple)");
+            }
         }
 
         // TEXT TO SPEECH SERVICE - Safari uyumlu
@@ -1757,17 +2018,17 @@ function save() {
             }
             // Safari'de önceki konuşmayı durdur
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
-            utterance.rate = 0.9;
+            activeUtterance = new SpeechSynthesisUtterance(text);
+            activeUtterance.lang = lang;
+            activeUtterance.rate = 0.9;
             // Safari'de ses listesi gecikmeli yüklenir
             const trySpeak = () => {
                 const voices = window.speechSynthesis.getVoices();
                 if (voices.length > 0) {
                     const preferred = voices.find(v => v.lang && v.lang.startsWith(lang.split('-')[0]));
-                    if (preferred) utterance.voice = preferred;
+                    if (preferred) activeUtterance.voice = preferred;
                 }
-                window.speechSynthesis.speak(utterance);
+                window.speechSynthesis.speak(activeUtterance);
             };
             if (window.speechSynthesis.getVoices().length === 0) {
                 window.speechSynthesis.onvoiceschanged = trySpeak;
@@ -1776,67 +2037,148 @@ function save() {
             }
         }
 
+        function cleanAiJson(raw) {
+            if (!raw) throw new Error("AI yanıtı boş geldi.");
+            const text = String(raw).replace(/```json|```/gi, "").trim();
+            const start = text.indexOf("{");
+            const end = text.lastIndexOf("}");
+            if (start === -1 || end === -1 || end <= start) {
+                throw new Error("AI yanıtında JSON bulunamadı.");
+            }
+            return text.slice(start, end + 1);
+        }
+
+        function parseAiJson(raw) {
+            return JSON.parse(cleanAiJson(raw));
+        }
+
+        function setCardStory(story, translation) {
+            const storyBox = document.getElementById("cardBackStory");
+            const storyText = document.getElementById("cardBackStoryText");
+            const storyTranslation = document.getElementById("cardBackStoryTranslation");
+            if (!storyBox || !storyText || !storyTranslation) return;
+
+            if (story || translation) {
+                storyText.textContent = story || "";
+                storyTranslation.textContent = translation || "";
+                storyTranslation.style.display = translation ? "block" : "none";
+                storyBox.style.display = "block";
+            } else {
+                storyText.textContent = "";
+                storyTranslation.textContent = "";
+                storyBox.style.display = "none";
+            }
+        }
+
         // ASYNC GROQ AI NETWORK AGENT WITH ACCURATE MULTILINGUAL RULES
-        async function runGroqAi(promptText) {
-            if(!appData.groqKey) { showToast("Lütfen önce API anahtarınızı girin.", "var(--orange)"); return null; }
-            
-            // AI KALİTESİNİ ARTIRMAK İÇİN GÜNCELLENMİŞ SİSTEM TALİMATLARI
-            const systemPrompt = `Sen dünya standartlarında bir Hollandaca dil uzmanı ve mentorusun.
-            KURALLAR:
-            1. Ürettiğin her türlü yaratıcı içerik (hikaye, mesaj, diyalog) SADECE doğal ve akıcı Hollandaca (nl-NL) olmalıdır.
-            2. Bu içeriklerin açıklamaları, dilbilgisi analizleri veya çevirileri SADECE Türkçe (tr-TR) olmalıdır.
-            3. Kesinlikle İngilizce kelime veya açıklama kullanma.
-            4. JSON yanıtı istenmişse, SADECE saf JSON döndür, açıklama ekleme.
-            5. Dilbilgisi kurallarına %100 sadık kal, hata yapma.
-            6. Kullanıcının seviyesine (A1-B2) uygun kelime haznesi seç.`;
+        async function runGroqAi(prompt) {
+            // Bellekteki çözülmüş anahtarı önceliklendir
+            const apiKey = sessionGroqKey || appData.groqKey; 
+            if (!apiKey) {
+                if (appData.encryptedGroqKey) {
+                    showToast("Lütfen önce AI kilidini açın.", "var(--orange)");
+                    document.getElementById("groqSetupScreen").style.display = "flex";
+                } else {
+                    showToast("Lütfen önce ayarlardan Groq API Anahtarınızı girin.", "var(--orange)");
+                }
+                return null;
+            }
+
+            // AI dil doğruluğunu korumak için sert sistem kuralı ekliyoruz
+            const systemPrompt = `Sen LinguaPrime içinde çalışan profesyonel bir Hollandaca öğretmenisin.
+Dil kuralları:
+- Hollandaca hikaye, diyalog, haber, örnek cümle ve sohbet yanıtları doğal nl-NL olmalı.
+- Açıklama, analiz, geri bildirim, anlam ve çeviri alanları doğal Türkçe olmalı.
+- İngilizce kullanma.
+- Hollandaca metnin içine Türkçe kelime karıştırma; Türkçe metnin içine gereksiz Hollandaca karıştırma.
+- Kullanıcı JSON formatı istiyorsa sadece geçerli JSON döndür; markdown, açıklama veya kod bloğu ekleme.
+- Uydurma şarkı sözü ya da telifli uzun alıntı üretme; gerekirse kısa özgün örnek cümlelerle analiz yap.`;
             
             try {
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${appData.groqKey}`
+                        "Authorization": `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile", // Daha zeki ve hatasız model
+                        model: "llama-3.1-8b-instant",
                         messages: [
                             { role: "system", content: systemPrompt },
-                            { role: "user", content: promptText }
+                            { role: "user", content: prompt }
                         ],
-                        temperature: 0.3
+                        temperature: 0.2
                     })
                 });
+                
+                if (response.status === 429) {
+                    throw new Error("Groq API Kotası Doldu! Lütfen biraz bekleyin.");
+                }
                 if(!response.ok) throw new Error("API isteği başarısız oldu.");
                 const resData = await response.json();
-                return (resData?.choices?.[0]?.message?.content || "").trim() || getMockAiResponse(promptText);
-            } catch(e) {
-                console.warn("Gerçek bağlantı kurulamadı, akıllı simülasyon çalıştırılıyor.");
-                return getMockAiResponse(promptText);
+                return resData.choices[0].message.content;
+            } catch (error) {
+                console.error("AI Hatası:", error);
+                showToast(error.message || "Bağlantı Hatası!", "var(--red)");
+                return getMockAiResponse(prompt); // Fallback to mock
             }
-        }
-
-        function parseAiJson(text) {
-            if (!text || typeof text !== "string") return null;
-            const cleaned = text.replace(/```json|```/g, "").trim();
-            try { return JSON.parse(cleaned); } catch (_) { }
-            try { return JSON.parse(text); } catch (_) { return null; }
         }
 
         // SYSTEM AI MOCK ENGINE BACKUP FOR STANDALONE OFFLINE EXPERIENCES
         function getMockAiResponse(promptText) {
-            if(promptText.includes("story")) return '{"story":"Er was eens bir adam... Hij woonde in een büyük **huis**. Hij had een snelle **de auto**.", "translation":"Bir zamanlar bir adam varmış... Büyük bir evde yaşıyormuş. Hızlı bir arabası varmış."}';
-            if(promptText.includes("düzelt")) return "Gramer analizi yapıldı: Cümleniz tamamen doğru! Tebrikler.";
-            if(promptText.includes("hafıza")) return "Kelime analizi tamamlandı. Hafıza ipucu: 'Auto' -> 'Otoban' kelimesinden aklınıza gelsin, otobanda giden hızlı araba.";
-            return "AI Mentor simülasyonu başarıyla yanıt üretti. Çalışmalarınız kaydediliyor.";
+            const p = promptText.toLowerCase();
+            if(p.includes("mini hikaye") || p.includes("mini story")) return '{"story":"Ik zie het woord in een kleine dagelijkse situatie. Daarna gebruik ik het meteen in een korte zin, zodat ik het beter onthoud.","translation":"Kelimeyi küçük bir günlük durum içinde görüyorum. Sonra onu kısa bir cümlede hemen kullanıyorum; böylece daha iyi hatırlıyorum."}';
+            if(p.includes("story")) return '{"story":"Mila loopt naar de markt. Ze koopt **de auto** niet, maar ze ziet een kleine fiets naast **het huis**. Daarna drinkt ze koffie met haar buurvrouw.","translation":"Mila pazara yürür. Arabayı satın almaz ama evin yanında küçük bir bisiklet görür. Sonra komşusuyla kahve içer."}';
+            if(p.includes("cards")) return '{"cards":[{"word":"de sleutel","meaning":"anahtar","sentence":"Ik leg de sleutel op de tafel."},{"word":"het raam","meaning":"pencere","sentence":"Het raam staat open."},{"word":"lopen","meaning":"yürümek","sentence":"Wij lopen naar het station."}]}';
+            if(p.includes("lines")) return '{"lines":[{"speaker":"Sophie","text":"Hoi Ahmet, hoe gaat het vandaag?","translation":"Merhaba Ahmet, bugün nasılsın?"},{"speaker":"Ahmet","text":"Goed, dank je. Ik oefen Nederlands.","translation":"İyiyim, teşekkür ederim. Hollandaca pratik yapıyorum."},{"speaker":"Sophie","text":"Mooi! Zullen we samen koffie drinken?","translation":"Güzel! Birlikte kahve içelim mi?"}]}';
+            if(p.includes("news")) return '{"news":[{"title":"Nieuw park in de buurt","content":"De gemeente opent deze week een klein park met extra banken en bomen.","vocab":"gemeente: belediye, park: park, banken: banklar, bomen: ağaçlar"},{"title":"Meer treinen in de ochtend","content":"Vanaf maandag rijden er meer treinen tussen Utrecht en Amsterdam.","vocab":"treinen: trenler, ochtend: sabah, rijden: çalışmak/gitmek"}]}';
+            if(p.includes("lyrics")) return '{"lyrics":[{"line":"Kısa özgün örnek: Ik wacht op jou in de regen.","meaning":"Yağmurda seni bekliyorum. Bekleyiş ve özlem duygusunu anlatan özgün kısa örnek."}]}';
+            if(p.includes("standard") && p.includes("slang")) return '{"standard":"goedemorgen","slang":"goeiemorgen","meaning":"Günlük konuşmada bazı sesler yumuşar ve kelime daha hızlı söylenir."}';
+            if(p.includes("scenes")) return '{"scenes":[{"title":"Zihinsel Görüntü","desc":"Kelimeyi tanıdık bir sahneye bağla ve Türkçe anlamıyla tek net görüntü kur."},{"title":"Ses Benzerliği","desc":"Hollandaca sesi Türkçedeki benzer bir sesle eşleştir, sonra örnek cümleyle pekiştir."}]}';
+            if(p.includes("layers")) return '{"layers":[{"title":"Söylenmesi Gereken Hollandaca İfade","desc":"Kısa, nazik ve doğrudan bir Hollandaca cümle kullan."},{"title":"Kültürel Görgü Kuralları","desc":"Hollanda iletişiminde açık ama sakin ifade tercih edilir."}]}';
+            if(p.includes("npc") && p.includes("cqchange")) return '{"npc":"Prima, fijne dag nog!","feedback":"Yanıt kısa, doğal ve kasadaki bağlama uygun.","cqChange":10}';
+            return "Şu anda gerçek AI yanıtı alınamadı. Lütfen API anahtarını veya bağlantıyı kontrol edin.";
+        }
+
+        async function generateStoryForCurrentCard() {
+            if (!currentCard) return;
+            const btn = document.getElementById("generateCardStoryBtn");
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "✨ Üretiliyor...";
+            }
+
+            const prompt = `"${currentCard.word}" kelimesi için A1-A2 seviyesinde 2 cümlelik mini hikaye üret.
+            Anlam: "${currentCard.meaning}". Örnek cümle: "${currentCard.sentence || ""}".
+            Kurallar: "story" sadece doğal Hollandaca olsun, "translation" sadece Türkçe çeviri olsun.
+            Sadece geçerli JSON döndür: {"story":"Hollandaca mini hikaye","translation":"Türkçe çeviri"}`;
+
+            const res = await runGroqAi(prompt);
+            try {
+                const data = parseAiJson(res);
+                currentCard.story = data.story || "";
+                currentCard.storyTranslation = data.translation || "";
+                setCardStory(currentCard.story, currentCard.storyTranslation);
+                save();
+                showToast("Mini hikaye karta eklendi.", "var(--green)");
+            } catch (e) {
+                showToast("Mini hikaye üretilemedi.", "var(--red)");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "✨ Mini Hikaye Üret";
+                }
+            }
         }
 
         // FULL MODULE ACTIONS IMPLEMENTATIONS
         async function handleStoryAi() {
             let level = document.getElementById("storyLevel").value;
             let theme = document.getElementById("storyTheme").value;
+            setMascot("storyMascot", "thinking");
             let outBox = document.getElementById("storyOutput");
             outBox.style.display = "block";
-            document.getElementById("storyTextContainer").textContent = "Hikaye dokunuyor, lütfen bekleyin...";
+            showSkeleton("storyTextContainer");
 
             // Çoklu destede seçili olan destelerin kelimelerini çekelim
             const checkedStoryDecks = document.querySelectorAll(".story-deck-checkbox:checked");
@@ -1847,81 +2189,91 @@ function save() {
                 storyPool = appData.cards.filter(c => selectedStoryDeckIds.includes(c.deckId));
             }
 
+            if (storyPool.length === 0) {
+                showToast("Seçili destelerde kullanılacak kart bulunamadı!", "var(--red)");
+                document.getElementById("storyTextContainer").textContent = "Lütfen önce kart ekleyin veya farklı bir deste seçin.";
+                return;
+            }
+
             const selectedWords = storyPool.slice(0, 8).map(c => c.word).join(", ");
             
-            let prompt = `Hollandaca ${level} seviyesinde ${theme ? theme : 'Günlük Yaşam'} hakkında kısa bir öykü yaz. Yazacağın hikayede şu kelimeleri kullanmaya gayret et ve hikaye metni içinde tam olarak çift asteriks (**kelime**) içine alarak kalın göster: ${selectedWords}. Hikayenin Türkçe çevirisini de yap. Yanıtı SADECE şu JSON şablonunda döndür: {"story":"Hollandaca hikaye metni", "translation":"Hikayenin Türkçe çevirisi"}`;
+            let prompt = `Seviye: ${level}. Tema: ${theme ? theme : 'Günlük Yaşam'}.
+            Şu kelimeleri doğal Hollandaca bir hikaye içinde kullan: ${selectedWords}.
+            Kurallar:
+            - "story" alanı sadece doğal Hollandaca olsun; Türkçe kelime kullanma.
+            - "translation" alanı sadece Türkçe çeviri olsun.
+            - Hikaye kısa, mantıklı ve ${level} seviyesine uygun olsun.
+            - Kullanılan hedef kelimeleri **kelime** biçiminde işaretle.
+            Sadece geçerli JSON döndür:
+            {"story":"Hollandaca hikaye metni","translation":"Türkçe çeviri"}`;
             
             let res = await runGroqAi(prompt);
-            if (!res) {
-                document.getElementById("storyTextContainer").textContent = "AI yanıtı alınamadı.";
+            try {
+                let data = parseAiJson(res);
+                setMascot("storyMascot", "happy");
+                document.getElementById("storyTextContainer").innerHTML = `
+                    <p style="font-size:15px; line-height:1.6; margin-bottom:12px;">${data.story.replace(/\*\*(.*?)\*\*/g, '<span class="story-highlight">$1</span>')}</p>
+                    <hr style="border:0; border-top:1px dashed var(--border); margin:12px 0;">
+                    <p style="font-size:14px; color:var(--muted); line-height:1.6;">${data.translation}</p>
+                `;
                 document.getElementById("storyTrContainer").textContent = "";
-                showToast("Hikaye üretilemedi.", "var(--red)");
-                return;
+            } catch(e) {
+                console.error("Hikaye Ayrıştırma Hatası:", e);
+                document.getElementById("storyTextContainer").innerHTML = `<p style="font-size:13px; color:var(--red);">Hikaye formatı çözümlenemedi. Yapay zeka yanıtı:</p><pre style="white-space:pre-wrap; font-size:12px;">${res}</pre>`;
+                setMascot("storyMascot", "sad");
             }
-            const parsed = parseAiJson(res);
-            if (!parsed) {
-                document.getElementById("storyTextContainer").textContent = res;
-                document.getElementById("storyTrContainer").textContent = "";
-                showToast("Hikaye sonuçları parse edilemedi.", "var(--orange)");
-                return;
-            }
-            document.getElementById("storyTextContainer").innerHTML = (parsed.story || "").replace(/\*\*(.*?)\*\*/g, '<span class="story-highlight">$1</span>');
-            document.getElementById("storyTrContainer").textContent = parsed.translation || "";
         }
 
+        // 4. SENTENCE CORRECTOR ACTION
         async function handleSentenceCorrection() {
-            let txt = document.getElementById("correctionInput").value;
+            let input = document.getElementById("correctionInput").value.trim();
+            if(!input) return;
             let resBox = document.getElementById("correctionResult");
             resBox.style.display = "block";
-            resBox.textContent = "Analiz ediliyor...";
-            let res = await runGroqAi(`Şu Hollandaca cümleyi analiz et, varsa gramer veya yazım hatalarını düzelt ve Türkçe olarak açıklamasını yap: ${txt}`);
-            if (!res) {
-                resBox.textContent = "AI yanıtı alınamadı.";
-                showToast("Cümle düzeltmesi başarısız.", "var(--red)");
-                return;
-            }
-            resBox.textContent = res;
+            showSkeleton("correctionResult");
+            
+            let prompt = `Şu Hollandaca cümleyi analiz et, gramer hatalarını düzelt ve nedenini kısa net şekilde Türkçe açıkla: "${input}".`;
+            let res = await runGroqAi(prompt);
+            resBox.innerHTML = res ? res.replace(/\n/g, "<br>") : "Analiz alınamadı.";
         }
 
+        // 6. AI DICTIONARY & COMPOSER ACTION
         async function handleAiDictionary() {
-            let q = document.getElementById("aiDictQuery").value;
-            let r = document.getElementById("aiDictResult");
-            r.style.display = "block"; r.textContent = "Sözlük aranıyor...";
-            let res = await runGroqAi(`"${q}" Hollandaca kelimesinin Türkçe anlamını, artikeli varsa türünü ve örnek bir cümlesini yaz. Çevirileri ve kelime açıklamalarını sadece Türkçe olarak yap.`);
-            if (!res) {
-                r.textContent = "AI yanıtı alınamadı.";
-                showToast("Sözlük araması başarısız.", "var(--red)");
-                return;
-            }
-            r.textContent = res;
+            let query = document.getElementById("aiDictQuery").value.trim();
+            if(!query) return;
+            let resBox = document.getElementById("aiDictResult");
+            resBox.style.display = "block";
+            showSkeleton("aiDictResult");
+            
+            let prompt = `"${query}" kelimesini analiz et. Şu bilgileri Türkçe ver: Kelime türü, De/Het artikeli, Türkçe anlamı, A1-A2 seviyesinde 2 adet örnek Hollandaca cümle ve Türkçe çevirisi.`;
+            let res = await runGroqAi(prompt);
+            resBox.innerHTML = res ? res.replace(/\n/g, "<br>") : "Sonuç bulunamadı.";
         }
 
+        // 7. LIVE AI CHAT MENTOR ACTION
         async function handleLiveChat() {
-            let inp = document.getElementById("chatInput");
-            let box = document.getElementById("chatMessages");
-            if(!inp.value.trim()) return;
+            let inputEl = document.getElementById("chatInput");
+            let text = inputEl.value.trim();
+            if(!text) return;
             
-            let uMsg = document.createElement("div");
-            uMsg.className = "chat-msg user";
-            uMsg.textContent = inp.value;
-            box.appendChild(uMsg);
-            box.scrollTop = box.scrollHeight;
-            let queryText = inp.value;
-            inp.value = "";
+            const addMsg = (box, txt, cls) => {
+                const div = document.createElement("div");
+                div.className = `chat-msg ${cls}`;
+                div.textContent = txt;
+                box.appendChild(div);
+            };
+
+            let msgBox = document.getElementById("chatMessages");
+            addMsg(msgBox, text, "user");
+            inputEl.value = "";
+            msgBox.scrollTop = msgBox.scrollHeight;
             
-            let bMsg = document.createElement("div");
-            bMsg.className = "chat-msg bot";
-            bMsg.textContent = "Düşünüyor...";
-            box.appendChild(bMsg);
+            let persona = document.getElementById("chatPersona").value;
+            let prompt = `Senin kişiliğin: ${persona}. Kullanıcının yazdığı şu Hollandaca mesaja uygun bir cevap ver (Sadece Hollandaca konuş): "${text}"`;
             
-            let res = await runGroqAi(`Benimle sadece Hollandaca (nl-NL) olarak konuşan bir dil öğretmenisin. Benim yazdığım şu cümleye uygun, kısa ve anlaşılır bir Hollandaca yanıt ver. Eğer yaptığım bir hata varsa bunu en fazla bir cümle ile Türkçe açıkla: ${queryText}`);
-            if (!res) {
-                bMsg.textContent = "AI yanıtı alınamadı.";
-                showToast("Sohbet yanıtı alınamadı.", "var(--red)");
-            } else {
-                bMsg.textContent = res;
-            }
-            box.scrollTop = box.scrollHeight;
+            let res = await runGroqAi(prompt);
+            addMsg(msgBox, res, "bot");
+            msgBox.scrollTop = msgBox.scrollHeight;
         }
 
         async function handlePodcastAi() {
@@ -1933,18 +2285,13 @@ function save() {
             playBtn.onclick = null;
             playBtn.disabled = true;
             
-            let prompt = `Bizim için Hollandalı Sophie ve Ahmet arasında geçen kısa, 6 satırlık bir podcast diyalogu üret. Konu: Gündelik Hollanda yaşamı. Çıktıyı JSON formatında ver: {"lines": [{"speaker": "Sophie", "text": "Hollandaca konuşma", "translation": "Türkçe çeviri"}, {"speaker": "Ahmet", "text": "Hollandaca konuşma", "translation": "Türkçe çeviri"}]}`;
+            let prompt = `Hollandalı Sophie ve Ahmet arasında geçen kısa, 6 satırlık bir podcast diyalogu üret. Konu: gündelik Hollanda yaşamı.
+            Kurallar: "text" sadece doğal Hollandaca olsun, "translation" sadece Türkçe çeviri olsun.
+            Sadece geçerli JSON döndür: {"lines":[{"speaker":"Sophie","text":"Hollandaca konuşma","translation":"Türkçe çeviri"},{"speaker":"Ahmet","text":"Hollandaca konuşma","translation":"Türkçe çeviri"}]}`;
             let res = await runGroqAi(prompt);
-            if (!res) {
-                document.getElementById("podcastStatusText").textContent = "AI yanıtı alınamadı.";
-                playBtn.disabled = false;
-                playBtn.onclick = () => speakTts("Welkom bij LinguaPrime Podcast Station. Vandaag gaan we het hebben over de Nederlandse cultuur.", "nl-NL");
-                showToast("Podcast oluşturulamadı.", "var(--red)");
-                return;
-            }
-            const data = parseAiJson(res);
-            if (data && Array.isArray(data.lines)) {
-                podcastLines = data.lines;
+            try {
+                let data = parseAiJson(res);
+                podcastLines = data.lines || [];
                 document.getElementById("podcastStatusText").textContent = "Yayın Hazır! (" + podcastLines.length + " satır)";
                 playBtn.disabled = false;
                 playBtn.onclick = () => {
@@ -1952,7 +2299,7 @@ function save() {
                     window.speechSynthesis.cancel();
                     playPodcastLine();
                 };
-            } else {
+            } catch (e) {
                 document.getElementById("podcastStatusText").textContent = "Bir hata oluştu, varsayılan dinleme oynatılıyor.";
                 playBtn.disabled = false;
                 playBtn.onclick = () => speakTts("Welkom bij LinguaPrime Podcast Station. Vandaag gaan we het hebben over de Nederlandse cultuur.", "nl-NL");
@@ -2002,7 +2349,7 @@ function save() {
             let prompt = `Kullanıcı Albert Heijn kasasında kasiyere "${decision}" yanıtını verdi. Bu durumun Hollanda kültürü uyumluluk değerlendirmesini yap. Kültürel IQ puan değişimi (+10 veya -10 gibi) ve kasiyerin sonraki tepkisini içeren bir JSON döndür: {"npc": "Kasiyerin cevabı (Sadece Hollandaca)", "feedback": "Kültürel analiz geri bildirimi (Sadece Türkçe)", "cqChange": 10}`;
             let res = await runGroqAi(prompt);
             try {
-                let data = JSON.parse(res);
+                let data = parseAiJson(res);
                 rpgCq += data.cqChange;
                 document.getElementById("rpgCqDisplay").textContent = `Kültürel IQ: ${rpgCq}`;
                 
@@ -2045,18 +2392,25 @@ function save() {
             
             let m = document.createElement("div");
             m.className = "wa-msg me";
-            m.innerHTML = `${txt}<div class="wa-time">10:01</div>`;
+            const txtSpan = document.createElement("span");
+            txtSpan.textContent = txt;
+            m.appendChild(txtSpan);
+            m.innerHTML += `<div class="wa-time">10:01</div>`;
             box.appendChild(m);
             box.scrollTop = box.scrollHeight;
             inp.value = "";
             
-            let prompt = `WhatsApp sohbetinde bir arkadaş olarak bu mesaja samimi, kısa ve emojili Hollandaca bir yanıt ver. Kesinlikle sadece Hollandaca konuş: ${txt}`;
+            const persona = document.getElementById("waPersona").value;
+            let prompt = `WhatsApp simülasyonu. Rolün: ${persona}. Kullanıcının şu mesajına kısa, doğal ve karakterine uygun bir Hollandaca yanıt ver. Sadece Hollandaca konuş: ${txt}`;
             let res = await runGroqAi(prompt);
             
             setTimeout(() => {
                 let r = document.createElement("div");
                 r.className = "wa-msg them";
-                r.innerHTML = `${res || 'Yanıt alınamadı.'}<div class="wa-time">10:02</div>`;
+                const resSpan = document.createElement("span");
+                resSpan.textContent = res;
+                r.appendChild(resSpan);
+                r.innerHTML += `<div class="wa-time">10:02</div>`;
                 box.appendChild(r);
                 box.scrollTop = box.scrollHeight;
             }, 1000);
@@ -2065,48 +2419,38 @@ function save() {
         async function handleMemoryPalace() {
             let w = document.getElementById("memoryWordInput").value;
             let r = document.getElementById("memoryResult"); r.style.display="block"; r.innerHTML = "Bellek sarayı inşa ediliyor...";
-            let res = await runGroqAi(`"${w}" kelimesi için Türkçe akılda kalıcı bir mnemoni, görsel hikaye ve çapa teknikleri üret. Çıktıyı JSON formatında ver, açıklamalar kesinlikle Türkçe olsun: {"scenes": [{"title": "Zihinsel Görüntü", "desc": "Detaylı sahne açıklaması"}, {"title": "Ses Benzerliği", "desc": "Fonetik çapa açıklaması"}]}`);
-            if (!res) {
-                r.textContent = "AI yanıtı alınamadı.";
-                showToast("Hafıza sarayı oluşturulamadı.", "var(--red)");
-                return;
-            }
-            const data = parseAiJson(res);
-            if (!data || !Array.isArray(data.scenes)) {
+            let res = await runGroqAi(`"${w}" kelimesi için Türkçe akılda kalıcı bir mnemoni, görsel hikaye ve çapa teknikleri üret. Sadece geçerli JSON döndür, açıklamalar kesinlikle Türkçe olsun: {"scenes":[{"title":"Zihinsel Görüntü","desc":"Detaylı sahne açıklaması"},{"title":"Ses Benzerliği","desc":"Fonetik çapa açıklaması"}]}`);
+            try {
+                let data = parseAiJson(res);
+                r.innerHTML = "";
+                data.scenes.forEach(s => {
+                    let div = document.createElement("div");
+                    div.className = "memory-card";
+                    div.innerHTML = `<strong>${s.title}</strong><p style="font-size: 13px; margin-top: 4px;">${s.desc}</p>`;
+                    r.appendChild(div);
+                });
+            } catch (e) {
                 r.innerHTML = `<div class="memory-card">${res}</div>`;
-                return;
             }
-            r.innerHTML = "";
-            data.scenes.forEach(s => {
-                let div = document.createElement("div");
-                div.className = "memory-card";
-                div.innerHTML = `<strong>${s.title}</strong><p style="font-size: 13px; margin-top: 4px;">${s.desc}</p>`;
-                r.appendChild(div);
-            });
         }
 
         async function handleSocialEngine() {
             let txt = document.getElementById("socialScenarioInput").value;
             let r = document.getElementById("socialResult"); r.style.display="block"; r.innerHTML = "Sosyal kurallar taranıyor...";
-            let prompt = `Şu duruma Hollanda kültürüne uygun sosyal pragmatik bir tepki stratejisi, söylenmesi gereken asıl cümle ve söylenmemesi gereken kaba tabiri içeren bir analiz üret. Açıklamalar Türkçe olmalı: ${txt}. Çıktıyı JSON formatında ver: {"layers": [{"title": "Söylenmesi Gereken Hollandaca İfade", "desc": "Doğru Hollandaca ifade"}, {"title": "Kültürel Görgü Kuralları", "desc": "Görgü kuralları Türkçe açıklaması"}]}`;
+            let prompt = `Şu duruma Hollanda kültürüne uygun sosyal pragmatik bir tepki stratejisi üret. Açıklamalar Türkçe olmalı: ${txt}. Sadece geçerli JSON döndür: {"layers":[{"title":"Söylenmesi Gereken Hollandaca İfade","desc":"Doğru Hollandaca ifade"},{"title":"Kültürel Görgü Kuralları","desc":"Görgü kuralları Türkçe açıklaması"}]}`;
             let res = await runGroqAi(prompt);
-            if (!res) {
-                r.textContent = "AI yanıtı alınamadı.";
-                showToast("Sosyal analiz başarısız.", "var(--red)");
-                return;
-            }
-            const data = parseAiJson(res);
-            if (!data || !Array.isArray(data.layers)) {
+            try {
+                let data = parseAiJson(res);
+                r.innerHTML = "";
+                data.layers.forEach(l => {
+                    let div = document.createElement("div");
+                    div.className = "social-layer";
+                    div.innerHTML = `<span class="social-layer-title">${l.title}</span><p style="font-size: 13px; margin-top: 4px;">${l.desc}</p>`;
+                    r.appendChild(div);
+                });
+            } catch (e) {
                 r.innerHTML = `<div class="social-layer">${res}</div>`;
-                return;
             }
-            r.innerHTML = "";
-            data.layers.forEach(l => {
-                let div = document.createElement("div");
-                div.className = "social-layer";
-                div.innerHTML = `<span class="social-layer-title">${l.title}</span><p style="font-size: 13px; margin-top: 4px;">${l.desc}</p>`;
-                r.appendChild(div);
-            });
         }
 
         function generateMatchingGame() {
@@ -2180,74 +2524,59 @@ function save() {
 
         async function handleNewsFeed() {
             let box = document.getElementById("newsFeedBox"); box.innerHTML = "Haber ajansları taranıyor...";
-            let prompt = "Hollanda gündeminden 2 adet çok kısa, basit düzeyde haber yaz ve her haberin altına Türkçe kelime sözlüğü ekle. Çıktıyı JSON formatında ver: {\"news\": [{\"title\": \"Haber Başlığı (Hollandaca)\", \"content\": \"Haber Metni (Hollandaca)\", \"vocab\": \"Kelime Sözlüğü (Yalnızca Türkçe Anlamları Olacak)\"}]}";
+            let prompt = "Hollanda gündemi tarzında 2 adet çok kısa, basit düzeyde özgün haber metni yaz. title ve content sadece Hollandaca olsun. vocab sadece Türkçe kelime açıklamaları olsun. Sadece geçerli JSON döndür: {\"news\":[{\"title\":\"Hollandaca haber başlığı\",\"content\":\"Hollandaca haber metni\",\"vocab\":\"Türkçe kelime sözlüğü\"}]}";
             let res = await runGroqAi(prompt);
-            if (!res) {
-                box.innerHTML = `<div class="correction-box">AI yanıtı alınamadı.</div>`;
-                showToast("Haber beslemesi oluşturulamadı.", "var(--red)");
-                return;
-            }
-            const data = parseAiJson(res);
-            if (!data || !Array.isArray(data.news)) {
+            try {
+                let data = parseAiJson(res);
+                box.innerHTML = "";
+                data.news.forEach(n => {
+                    let div = document.createElement("div");
+                    div.className = "correction-box";
+                    div.innerHTML = `<strong>${n.title}</strong><p style="font-size: 13px; margin: 6px 0;">${n.content}</p><small style="color: var(--orange);">${n.vocab}</small>`;
+                    box.appendChild(div);
+                });
+            } catch (e) {
                 box.innerHTML = `<div class="correction-box">${res}</div>`;
-                return;
             }
-            box.innerHTML = "";
-            data.news.forEach(n => {
-                let div = document.createElement("div");
-                div.className = "correction-box";
-                div.innerHTML = `<strong>${n.title}</strong><p style="font-size: 13px; margin: 6px 0;">${n.content}</p><small style="color: var(--orange);">${n.vocab}</small>`;
-                box.appendChild(div);
-            });
         }
 
         async function handleAccentDecoder() {
             let type = document.getElementById("accentType").value;
             let word = document.getElementById("accentWordInput").value;
             let r = document.getElementById("accentResult"); r.style.display="block"; r.innerHTML = "Aksan çözülüyor...";
-            let prompt = `Hollandaca ${type} aksanına göre "${word || 'genel popüler terimler'}" yapısının okunuşunu, fonetik kaymalarını ve sokak kullanımını Türkçe olarak açıkla. Çıktıyı JSON formatında ver: {"standard": "Standart Hollandaca okunuş", "slang": "Aksanlı okunuş", "meaning": "Türkçe Açıklama"}`;
+            let prompt = `Hollandaca ${type} aksanına göre "${word || 'genel popüler terimler'}" yapısının okunuşunu, fonetik kaymalarını ve sokak kullanımını Türkçe olarak açıkla. Sadece geçerli JSON döndür: {"standard":"Standart Hollandaca okunuş","slang":"Aksanlı okunuş","meaning":"Türkçe açıklama"}`;
             let res = await runGroqAi(prompt);
-            if (!res) {
-                r.textContent = "AI yanıtı alınamadı.";
-                showToast("Aksan çözümlemesi başarısız.", "var(--red)");
-                return;
-            }
-            const data = parseAiJson(res);
-            if (!data) {
-                r.innerHTML = `<div class="accent-block">${res}</div>`;
-                return;
-            }
-            r.innerHTML = `
+            try {
+                let data = parseAiJson(res);
+                r.innerHTML = `
                     <div class="accent-block">
-                        <strong>Standart:</strong> ${data.standard || ''}<br>
-                        <strong>Aksan:</strong> <span style="color: var(--orange); font-weight: bold;">${data.slang || ''}</span><br>
-                        <small>${data.meaning || ''}</small>
+                        <strong>Standart:</strong> ${data.standard}<br>
+                        <strong>Aksan:</strong> <span style="color: var(--orange); font-weight: bold;">${data.slang}</span><br>
+                        <small>${data.meaning}</small>
                     </div>
                 `;
+            } catch (e) {
+                r.innerHTML = `<div class="accent-block">${res}</div>`;
+            }
         }
 
         async function handleLyricsBreakdown() {
             let song = document.getElementById("lyricsSongInput").value;
             let r = document.getElementById("lyricsResult"); r.style.display="block"; r.innerHTML="Şarkı yapısı inceleniyor...";
-            let prompt = `"${song}" şarkısının en önemli 2 dizesini seçip, deyimleri ve kelime anlamlarını Türkçe açıklayan bir analiz yap. Çıktıyı JSON formatında ver: {"lyrics": [{"line": "Orijinal Hollandaca Dize", "meaning": "Deyimsel Türkçe Anlamı ve Açıklaması"}]}`;
+            let prompt = `"${song}" için telifli şarkı sözlerini uzun alıntılama. Varsa en fazla 2 çok kısa ifade veya özgün benzer örnek üzerinden deyim ve kelime anlamlarını Türkçe açıkla. Sadece geçerli JSON döndür: {"lyrics":[{"line":"Çok kısa Hollandaca ifade veya özgün örnek","meaning":"Deyimsel Türkçe anlamı ve açıklaması"}]}`;
             let res = await runGroqAi(prompt);
-            if (!res) {
-                r.textContent = "AI yanıtı alınamadı.";
-                showToast("Şarkı analizi başarısız.", "var(--red)");
-                return;
-            }
-            const data = parseAiJson(res);
-            if (!data || !Array.isArray(data.lyrics)) {
+            try {
+                let data = parseAiJson(res);
+                r.innerHTML = "";
+                data.lyrics.forEach(l => {
+                    let div = document.createElement("div");
+                    div.className = "correction-box";
+                    div.innerHTML = `<strong style="color: var(--purple);">${l.line}</strong><p style="font-size: 13px; margin-top: 4px;">${l.meaning}</p>`;
+                    r.appendChild(div);
+                });
+            } catch (e) {
                 r.innerHTML = `<div class="correction-box">${res}</div>`;
-                return;
             }
-            r.innerHTML = "";
-            data.lyrics.forEach(l => {
-                let div = document.createElement("div");
-                div.className = "correction-box";
-                div.innerHTML = `<strong style="color: var(--purple);">${l.line}</strong><p style="font-size: 13px; margin-top: 4px;">${l.meaning}</p>`;
-                r.appendChild(div);
-            });
         }
 
         async function handleLinguisticDna() {
@@ -2257,11 +2586,6 @@ function save() {
             
             let prompt = `Kullanıcının yazdığı "${input}" Hollandaca metnini incele. Bir Türk beyninin bu dili kurgularken yaptığı tipik morfolojik hataları, kelime dizilim kaymalarını saptayan Türkçe bir DNA raporu üret.`;
             let res = await runGroqAi(prompt);
-            if (!res) {
-                r.textContent = "AI yanıtı alınamadı.";
-                showToast("DNA analizi başarısız.", "var(--red)");
-                return;
-            }
             r.textContent = res;
         }
 
@@ -2294,11 +2618,6 @@ function save() {
             
             let prompt = `Kullanıcının şu hatalı kelimeleri üzerinden genel bir linguistik öğrenme tıkanıklığı ve bilişsel hata kalıbı analizi çıkar. Analiz tamamen Türkçe olmalıdır: ${wrongCards}`;
             let res = await runGroqAi(prompt);
-            if (!res) {
-                r.textContent = "AI yanıtı alınamadı.";
-                showToast("Müze analizi başarısız.", "var(--red)");
-                return;
-            }
             r.textContent = res;
         }
 
@@ -2537,7 +2856,12 @@ function save() {
                 word: w,
                 meaning: m,
                 sentence: sStr,
-                modalConjugation: cStr || "maak,maakt,maken"
+                modalConjugation: cStr || "maak,maakt,maken",
+                // SM-2 Algoritma başlangıç değerleri
+                interval: 0,
+                repetitions: 0,
+                ease: 2.5,
+                nextReview: Date.now()
             });
             save();
             document.getElementById("manualCardForm").style.display = "none";
@@ -2563,12 +2887,30 @@ function save() {
 
         // GLOBAL CONFIG SYSTEM PLATFORM
         function saveGroqKey() {
-            let val = document.getElementById("groqKeyInput").value.trim();
-            if(val) {
-                appData.groqKey = val;
+            let keyVal = document.getElementById("groqKeyInput").value.trim();
+            let passVal = document.getElementById("masterPasswordInput").value.trim();
+            if(keyVal && passVal) {
+                appData.encryptedGroqKey = SimpleCrypto.encrypt(keyVal, passVal);
+                appData.groqKey = null; // Plain text'i tamamen temizle
+                sessionGroqKey = keyVal;
                 save();
                 document.getElementById("groqSetupScreen").style.display = "none";
-                showToast("Sistem başarıyla aktifleştirildi!", "var(--green)");
+                showToast("Anahtar şifrelendi ve kaydedildi!", "var(--green)");
+            } else {
+                showToast("Anahtar ve Master Şifre zorunludur.", "var(--orange)");
+            }
+        }
+
+        function unlockGroqKey() {
+            let passVal = document.getElementById("masterPasswordInput").value.trim();
+            if(!passVal) return;
+            let decrypted = SimpleCrypto.decrypt(appData.encryptedGroqKey, passVal);
+            if(decrypted && decrypted.startsWith("gsk_")) {
+                sessionGroqKey = decrypted;
+                document.getElementById("groqSetupScreen").style.display = "none";
+                showToast("AI Erişimi Açıldı!", "var(--green)");
+            } else {
+                showToast("Hatalı Master Şifre!", "var(--red)");
             }
         }
 
@@ -2594,46 +2936,93 @@ function save() {
             }
         }
 
-        function updateGlobalStreak() {
-            document.getElementById("streakCount").textContent = appData.stats.streak || 0;
+        function applyDyslexicPreference() {
+            const isEnabled = appData.dyslexicMode || false;
+            document.body.classList.toggle("dyslexic", isEnabled);
+            if (document.getElementById("dyslexicToggle")) document.getElementById("dyslexicToggle").checked = isEnabled;
         }
 
+        function updateGlobalStreak() {
+            document.getElementById("streakCount").textContent = appData.stats.streak || 0;
+            updateMasteryBars();
+        }
+
+        function updateMasteryBars() {
+            if (!currentCard) return;
+            const reps = currentCard.repetitions || 0;
+            const wrong = currentCard.wrong || 0;
+            const pct = Math.min(Math.max((reps * 20) - (wrong * 10), 0), 100);
+            document.querySelectorAll(".learning-level-fill").forEach(el => {
+                el.style.width = pct + "%";
+            });
+        }
+
+        let statsChartInstance = null;
         function renderWeekChart() {
-            const container = document.getElementById("weekChart");
-            if (!container) return;
-            container.innerHTML = "";
+            if (!window.Chart || !document.getElementById("statsChart")) return;
+            
+            const canvas = document.getElementById("statsChart");
+            if (!canvas) return;
+            
             const days = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
             const today = new Date();
-            const todayStr = today.toDateString();
             const weeklyData = appData.stats.weeklyData || {};
-            const entries = [];
+            const labels = [];
+            const dataPoints = [];
+
             for (let i = 6; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(today.getDate() - i);
-                entries.push({ label: days[d.getDay() === 0 ? 6 : d.getDay() - 1], dateStr: d.toDateString(), count: weeklyData[d.toDateString()] || 0 });
+                labels.push(days[d.getDay() === 0 ? 6 : d.getDay() - 1]);
+                dataPoints.push(weeklyData[d.toDateString()] || 0);
             }
-            const max = Math.max(...entries.map(e => e.count), 1);
-            entries.forEach(e => {
-                const wrap = document.createElement("div");
-                wrap.className = "week-bar-wrap";
-                const bar = document.createElement("div");
-                bar.className = "week-bar" + (e.dateStr === todayStr ? " today" : "");
-                bar.style.height = `${Math.max((e.count / max) * 60, 4)}px`;
-                const val = document.createElement("div");
-                val.className = "week-val";
-                val.textContent = e.count > 0 ? e.count : "";
-                const lbl = document.createElement("div");
-                lbl.className = "week-label";
-                lbl.textContent = e.label;
-                wrap.appendChild(val);
-                wrap.appendChild(bar);
-                wrap.appendChild(lbl);
-                container.appendChild(wrap);
+
+            if (statsChartInstance) statsChartInstance.destroy();
+
+            const isLight = document.body.classList.contains("light");
+            const accentColor = "#F97316";
+
+            statsChartInstance = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tamamlanan Kart',
+                        data: dataPoints,
+                        borderColor: accentColor,
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: accentColor,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: isLight ? '#E2E8F0' : '#1E293B' }, ticks: { color: '#64748B' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748B' } }
+                    }
+                }
             });
         }
 
         // AI KART ÜRETİCİ
         let aiGeneratedCards = [];
+
+        function showSkeleton(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = `
+                <div class="skeleton-loader">
+                    <div class="skeleton-item" style="width: 80%"></div>
+                    <div class="skeleton-item" style="width: 100%"></div>
+                    <div class="skeleton-item" style="width: 90%"></div>
+                </div>`;
+        }
 
         function populateAiGenDeckTarget() {
             const sel = document.getElementById("aiGenDeckTarget");
@@ -2650,9 +3039,7 @@ function save() {
         async function handleAiCardGeneration() {
             const topic = document.getElementById("aiGenTopic").value.trim() || "genel kelimeler";
             const level = document.getElementById("aiGenLevel").value;
-            let count = parseInt(document.getElementById("aiGenCount").value, 10);
-            if (isNaN(count) || count < 3) count = 10;
-            count = Math.min(count, 30);
+            const count = Math.min(parseInt(document.getElementById("aiGenCount").value) || 10, 30);
             const btn = document.getElementById("aiGenCardsBtn");
             const preview = document.getElementById("aiGenPreview");
             const saveBtn = document.getElementById("aiGenSaveBtn");
@@ -2663,15 +3050,16 @@ function save() {
             saveBtn.style.display = "none";
             aiGeneratedCards = [];
 
-            const prompt = `"${topic}" konusunda ${level} seviyesinde ${count} adet Hollandaca-Türkçe kelime kartı üret. Her kartta kelime, anlam ve kısa bir Hollandaca örnek cümle olsun. SADECE şu JSON formatında döndür, başka hiçbir şey yazma: {"cards":[{"word":"Hollandaca kelime","meaning":"Türkçe anlam","sentence":"Hollandaca örnek cümle"}]}`;
+            const prompt = `"${topic}" konusunda ${level} seviyesinde ${count} adet Hollandaca-Türkçe kelime kartı üret.
+            Kurallar: "word" doğal Hollandaca kelime/ifade, "meaning" sadece Türkçe anlam, "sentence" sadece doğru ve basit Hollandaca örnek cümle olsun.
+            Sadece geçerli JSON döndür: {"cards":[{"word":"Hollandaca kelime","meaning":"Türkçe anlam","sentence":"Hollandaca örnek cümle"}]}`;
 
             const res = await runGroqAi(prompt);
             btn.disabled = false;
             btn.textContent = "✨ Kartları Üret";
 
             try {
-                const clean = res.replace(/```json|```/g, "").trim();
-                const data = JSON.parse(clean);
+                const data = parseAiJson(res);
                 aiGeneratedCards = data.cards || [];
                 preview.style.display = "flex";
                 preview.innerHTML = "";
@@ -2715,36 +3103,47 @@ function save() {
 
         function updateProgress() {
             let currentAreaCount = 0;
+            let pool = [];
             if (activeDeckId === "all") {
-                currentAreaCount = appData.cards.length;
+                pool = appData.cards;
             } else if (activeDeckId === "multi") {
-                currentAreaCount = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId)).length;
+                pool = appData.cards.filter(c => appData.multiDeckIds.includes(c.deckId));
             } else {
-                currentAreaCount = appData.cards.filter(c => c.deckId === activeDeckId).length;
+                pool = appData.cards.filter(c => c.deckId === activeDeckId);
             }
+            currentAreaCount = pool.length;
 
             const learnedCount = appData.cards.filter(c => (c.repetitions || 0) > 0).length;
             const progressPercent = appData.cards.length > 0 ? (learnedCount / appData.cards.length) * 100 : 0;
+
+            const dueCount = pool.filter(c => !c.nextReview || c.nextReview <= Date.now()).length;
+            const newCount = pool.filter(c => (c.repetitions || 0) === 0 && (c.wrong || 0) === 0).length;
+            const seenCount = Math.max(currentAreaCount - newCount, 0);
+            const progressTextEl = document.getElementById("progressText");
+            if (progressTextEl) {
+                if (currentAreaCount > 0) {
+                    progressTextEl.textContent = `Destede ${currentAreaCount} kart · ${newCount} yeni · ${dueCount} tekrar bekliyor · ${seenCount} görülmüş`;
+                } else {
+                    progressTextEl.textContent = "Çalışılacak kart kalmadı!";
+                }
+            }
 
             document.getElementById("statsTotalCards").textContent = appData.cards.length;
             document.getElementById("statsLearnedCards").textContent = learnedCount;
             document.getElementById("statsTotalRepetitions").textContent = appData.stats.totalRepetitions;
             document.getElementById("statsTotalErrors").textContent = appData.stats.totalErrors;
-            document.getElementById("sessionCount").textContent = sessionCompletedIds.length;
-            
-            const currentTodayReps = appData.stats.todayReps || 0;
-            const currentGoal = appData.stats.dailyGoal || 10;
-            document.getElementById("progressText").textContent = `Bugün ${currentTodayReps} kart çalışıldı (Hedef: ${currentGoal})`;
-
             document.getElementById("progressBarFill").style.width = `${progressPercent}%`;
 
-            const goalPercent = Math.min((currentTodayReps / currentGoal) * 100, 100);
+            // Günlük hedef güncelle
+            const goal = appData.stats.dailyGoal || 10;
+            const todayReps = appData.stats.todayReps || 0;
+            const goalPercent = Math.min((todayReps / goal) * 100, 100);
             const goalBar = document.getElementById("dailyGoalBar");
             const goalText = document.getElementById("dailyGoalText");
             const goalInput = document.getElementById("dailyGoalInput");
             if (goalBar) goalBar.style.width = `${goalPercent}%`;
-            if (goalText) goalText.textContent = `${currentTodayReps} / ${currentGoal}`;
-            if (goalInput) goalInput.value = currentGoal;
+            if (goalText) goalText.textContent = `${todayReps} / ${goal}`;
+            if (goalInput) goalInput.value = goal;
 
             renderWeekChart();
         }
@@ -2793,137 +3192,37 @@ function save() {
             reader.readAsText(file);
         }
 
-        function makeSafeDeckId(name) {
-            const base = String(name || "deste")
-                .toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/ı/g, "i")
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/^-+|-+$/g, "")
-                .slice(0, 36) || "deste";
-            let id = base;
-            let index = 2;
-            while (appData.decks.some(d => d.id === id)) {
-                id = `${base}-${index++}`;
-            }
-            return id;
-        }
-
-        function normalizeImportedCard(rawCard, fallbackDeckId) {
-            if (!rawCard || typeof rawCard !== "object") return null;
-            const word = rawCard.word || rawCard.front || rawCard.nl || rawCard.dutch || rawCard.term || rawCard.question;
-            const meaning = rawCard.meaning || rawCard.back || rawCard.tr || rawCard.turkish || rawCard.translation || rawCard.answer;
-            if (!word || !meaning) return null;
-            return {
-                ...rawCard,
-                id: rawCard.id || "c_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8),
-                deckId: rawCard.deckId || fallbackDeckId,
-                word: String(word).trim(),
-                meaning: String(meaning).trim(),
-                sentence: rawCard.sentence || rawCard.example || "",
-                repetitions: Number(rawCard.repetitions || 0),
-                wrong: Number(rawCard.wrong || 0),
-                modeStats: rawCard.modeStats || {}
-            };
-        }
-
-        function addImportedDeck(rawDeck, fallbackName) {
-            const deckName = String(rawDeck?.name || rawDeck?.title || rawDeck?.deckName || fallbackName || "İçe Aktarılan Deste").trim();
-            const preferredId = rawDeck?.id ? String(rawDeck.id).trim() : "";
-            let deckId = preferredId && !appData.decks.some(d => d.id === preferredId) ? preferredId : makeSafeDeckId(deckName);
-            const deck = {
-                id: deckId,
-                name: deckName,
-                color: rawDeck?.color || "#F97316",
-                emoji: rawDeck?.emoji || "📁"
-            };
-            appData.decks.push(deck);
-            return deck.id;
-        }
-
-        function importCardsToDeck(cards, fallbackDeckId) {
-            let added = 0;
-            cards.forEach(rawCard => {
-                const normalized = normalizeImportedCard(rawCard, fallbackDeckId);
-                if (!normalized) return;
-                if (appData.cards.some(c => c.id === normalized.id)) {
-                    normalized.id = "c_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
-                }
-                appData.cards.push(normalized);
-                added++;
-            });
-            return added;
-        }
-
         function importSystemData(e) {
             let file = e.target.files[0];
             if (!file) return;
             let reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    let parsed = JSON.parse(String(evt.target.result).replace(/^\uFEFF/, ""));
-                    let addedDecks = 0;
-                    let addedCards = 0;
-                    let firstImportedDeckId = null;
-
-                    if (Array.isArray(parsed)) {
-                        const looksLikeCards = parsed.some(item => item && (item.word || item.front || item.nl || item.term || item.question));
-                        if (looksLikeCards) {
-                            const targetDeckId = activeDeckId !== "all" && activeDeckId !== "multi" ? activeDeckId : appData.decks[0]?.id || addImportedDeck({ name: "İçe Aktarılan Kartlar" });
-                            firstImportedDeckId = targetDeckId;
-                            addedCards += importCardsToDeck(parsed, targetDeckId);
-                        } else {
-                            parsed.forEach((deck, index) => {
-                                const deckId = addImportedDeck(deck, `İçe Aktarılan Deste ${index + 1}`);
-                                if (!firstImportedDeckId) firstImportedDeckId = deckId;
-                                addedDecks++;
-                                if (Array.isArray(deck.cards)) addedCards += importCardsToDeck(deck.cards, deckId);
-                            });
-                        }
-                    } else if (parsed && typeof parsed === "object") {
-                        const deckSources = Array.isArray(parsed.decks) ? parsed.decks : (parsed.deck ? [parsed.deck] : []);
-                        deckSources.forEach((deck, index) => {
-                            const deckId = addImportedDeck(deck, `İçe Aktarılan Deste ${index + 1}`);
-                            if (!firstImportedDeckId) firstImportedDeckId = deckId;
-                            addedDecks++;
-                            if (Array.isArray(deck.cards)) addedCards += importCardsToDeck(deck.cards, deckId);
-                        });
-
-                        if (Array.isArray(parsed.cards)) {
-                            const shouldCreateDeck = !firstImportedDeckId && (parsed.name || parsed.title || parsed.deckName || parsed.color || parsed.emoji);
-                            const targetDeckId = firstImportedDeckId || (shouldCreateDeck ? addImportedDeck(parsed, "İçe Aktarılan Deste") : (activeDeckId !== "all" && activeDeckId !== "multi" ? activeDeckId : appData.decks[0]?.id || addImportedDeck({ name: "İçe Aktarılan Kartlar" })));
-                            if (shouldCreateDeck) addedDecks++;
-                            if (!firstImportedDeckId) firstImportedDeckId = targetDeckId;
-                            addedCards += importCardsToDeck(parsed.cards, targetDeckId);
-                        } else if (Array.isArray(parsed.items)) {
-                            const deckId = firstImportedDeckId || addImportedDeck(parsed, parsed.name || "İçe Aktarılan Deste");
-                            if (!firstImportedDeckId) { firstImportedDeckId = deckId; addedDecks++; }
-                            addedCards += importCardsToDeck(parsed.items, deckId);
-                        }
-
-                        if (!addedDecks && !addedCards && (parsed.word || parsed.front || parsed.nl || parsed.term || parsed.question)) {
-                            const targetDeckId = activeDeckId !== "all" && activeDeckId !== "multi" ? activeDeckId : appData.decks[0]?.id || addImportedDeck({ name: "İçe Aktarılan Kartlar" });
-                            firstImportedDeckId = targetDeckId;
-                            addedCards += importCardsToDeck([parsed], targetDeckId);
-                        }
-                    }
-
-                    if (addedDecks || addedCards) {
+                    let parsed = JSON.parse(evt.target.result);
+                    if(parsed && Array.isArray(parsed.cards) && Array.isArray(parsed.decks)) {
+                        // Mevcut varsayılan yapıyı korumak için yüklenen veriyi güvenli bir şekilde birleştir
+                        appData = Object.assign({}, appData, parsed);
+                        
                         save();
-                        renderSidebar();
-                        selectDeck(firstImportedDeckId || activeDeckId);
-                        closeModal("settingsModal");
-                        showToast(`${addedDecks} deste, ${addedCards} kart içe aktarıldı.`, "var(--green)");
+                        location.reload();
                     } else {
-                        showToast("JSON içinde içe aktarılacak deste veya kart bulunamadı.", "var(--red)");
+                        showToast("Geçersiz JSON formatı! 'cards' ve 'decks' alanları zorunludur.", "var(--red)");
                     }
                 } catch(err) { showToast("Dosya okuma hatası veya geçersiz JSON!", "var(--red)"); }
-                e.target.value = "";
             };
             reader.readAsText(file);
         }
 
         // TOAST ENGINE & DRAWERS WINDOWS CONTROLLER
+        function normalizeForComparison(str) {
+            if (!str) return "";
+            return str.trim()
+                .toLowerCase()
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"") // Noktalama işaretlerini temizle
+                .replace(/\s+/g, " ") // Fazla boşlukları temizle
+                .replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c');
+        }
+
         function showToast(text, bg) {
             const toast = document.getElementById("toast");
             toast.textContent = text;
@@ -2935,6 +3234,15 @@ function save() {
         function openModal(id) {
             closeAllDrawers();
             document.getElementById(id).classList.add("open");
+            
+            // AI Focus Mode logic
+            const aiModals = ["storyModal", "chatModal", "rpgModal", "whatsappModal", "aiDictModal"];
+            if (aiModals.includes(id)) {
+                document.body.classList.add("modal-open");
+                document.getElementById("focusOverlay").style.display = "block";
+            }
+            if (id === "storyModal") setMascot("storyMascot", "happy");
+
             document.getElementById("overlay").classList.add("show");
             
             // Dynamic render calls on open if applicable
@@ -2959,22 +3267,18 @@ function save() {
             }
         }
 
-        // ODAK MODU GEÇİŞ FONKSİYONU
-        function toggleModalFocus(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.toggle("fullscreen");
-        }
-
         function closeModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.remove("open");
-            modal.classList.remove("fullscreen"); // Kapatınca odak modundan çık
+            document.getElementById(id).classList.remove("open");
+            document.body.classList.remove("modal-open");
+            document.getElementById("focusOverlay").style.display = "none";
             if (!document.querySelector(".modal.open")) {
                 document.getElementById("overlay").classList.remove("show");
             }
         }
 
         function closeAllDrawers() {
+            document.body.classList.remove("modal-open");
+            document.getElementById("focusOverlay").style.display = "none";
             closeSidebar();
             document.querySelectorAll(".modal").forEach(m => m.classList.remove("open"));
         }
